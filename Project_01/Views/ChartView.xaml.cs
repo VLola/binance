@@ -15,7 +15,7 @@ namespace Project_01.Views
         public ChartView()
         {
             InitializeComponent();
-            this.DataContext = new ChartViewModel();
+            this.DataContext = new ChartViewModel(this);
             MouseWheel += WindowChart_MouseWheel;
             MouseMove += WindowChart_MouseMove;
         }

@@ -84,11 +84,11 @@
                                 <Rectangle Width="6" Height="{Binding ClosePrice}" Margin="-2 0 2 0">
                                     <Shape.Style>
                                         <Style TargetType="Shape">
-                                            <Setter Property="Stroke" Value="OrangeRed" />
+                                            <Setter Property="Stroke" Value="{Binding Color}" />
                                             <Setter Property="Fill" Value="DarkRed" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsPositive}" Value="True">
-                                                    <Setter Property="Stroke" Value="LawnGreen" />
+                                                    <Setter Property="Stroke" Value="{Binding Color}" />
                                                     <Setter Property="Fill" Value="ForestGreen" />
                                                 </DataTrigger>
                                             </Style.Triggers>

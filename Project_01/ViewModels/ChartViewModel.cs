@@ -63,10 +63,13 @@ namespace Project_01.ViewModels
         }
         private async void Select()
         {
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 try
                 {
+                    _chartView.Dispatcher.Invoke(new Action(() => {
+                        if(ChartModel.Candles.Count > 0) ChartModel.Candles.Clear();
+                    }));
                     var result = client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: ChartModel.SelectedSymbol, interval: KlineInterval.OneMinute, limit: 499).Result;
                     if (result.Success)
                     {
@@ -85,6 +88,7 @@ namespace Project_01.ViewModels
                             }));
                             openTime += 7;
                         }
+                        Run();
                     }
                 }
 
@@ -94,5 +98,44 @@ namespace Project_01.ViewModels
                 }
             });
         }
+        private async void Run()
+        {
+            await Task.Run(() =>
+            {
+                _chartView.Dispatcher.Invoke(new Action(() => {
+                    for (int i = 0; i < ChartModel.Candles.Count - 3; i++)
+                    {
+                        for (int j = 0; j < ChartModel.Candles.Count - 3; j++)
+                        {
+                            if(i != j && i != j + 1 && i != j + 2 && i != j - 1 && i != j - 2 && ChartModel.Candles[i].ClosePrice != 0m && ChartModel.Candles[i + 1].ClosePrice != 0m && ChartModel.Candles[i + 2].ClosePrice != 0m && ChartModel.Candles[j].ClosePrice != 0m && ChartModel.Candles[j + 1].ClosePrice != 0m && ChartModel.Candles[j + 2].ClosePrice != 0m)
+                            {
+                                if (ChartModel.Candles[i].IsPositive == ChartModel.Candles[j].IsPositive && ChartModel.Candles[i + 1].IsPositive == ChartModel.Candles[j + 1].IsPositive && ChartModel.Candles[i + 2].IsPositive == ChartModel.Candles[j + 2].IsPositive) {
+
+                                    decimal one1 = ChartModel.Candles[i].ClosePrice / ChartModel.Candles[i + 1].ClosePrice;
+                                    decimal one2 = ChartModel.Candles[i].ClosePrice / ChartModel.Candles[i + 2].ClosePrice;
+                                    decimal two1 = ChartModel.Candles[j].ClosePrice / ChartModel.Candles[j + 1].ClosePrice;
+                                    decimal two2 = ChartModel.Candles[j].ClosePrice / ChartModel.Candles[j + 2].ClosePrice;
+                                    decimal openOne1 = (ChartModel.Candles[i].OpenPrice - ChartModel.Candles[i + 1].OpenPrice) / ChartModel.Candles[i].ClosePrice;
+                                    decimal openOne2 = (ChartModel.Candles[i].OpenPrice - ChartModel.Candles[i + 2].OpenPrice) / ChartModel.Candles[i].ClosePrice;
+                                    decimal openTwo1 = (ChartModel.Candles[j].OpenPrice - ChartModel.Candles[j + 1].OpenPrice) / ChartModel.Candles[j].ClosePrice;
+                                    decimal openTwo2 = (ChartModel.Candles[j].OpenPrice - ChartModel.Candles[j + 2].OpenPrice) / ChartModel.Candles[j].ClosePrice;
+
+
+                                    if ((one1 + (one1 * 0.1m)) > two1 && (one1 - (one1 * 0.1m)) < two1 && (one2 + (one2 * 0.1m)) > two2 && (one2 - (one2 * 0.1m)) < two2 && (openOne1 + (openOne1 * 0.1m)) > openTwo1 && (openOne1 - (openOne1 * 0.1m)) < openTwo1 && (openOne2 + (openOne2 * 0.1m)) > openTwo2 && (openOne2 - (openOne2 * 0.1m)) < openTwo2)
+                                    {
+                                        ChartModel.Candles[i].Color = "White";
+                                        ChartModel.Candles[i + 1].Color = "White";
+                                        ChartModel.Candles[i + 2].Color = "White";
+                                        ChartModel.Candles[j].Color = "White";
+                                        ChartModel.Candles[j + 1].Color = "White";
+                                        ChartModel.Candles[j + 2].Color = "White";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }));
+            });
+        } 
     }
 }

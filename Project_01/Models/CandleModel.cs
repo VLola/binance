@@ -38,12 +38,14 @@ namespace Project_01.Models
                 IsPositive = true;
                 OpenPrice = (open);
                 ClosePrice = (close - open);
+                Color = "LawnGreen";
             }
             else
             {
                 IsPositive = false;
                 OpenPrice = (close);
                 ClosePrice = (open - close);
+                Color = "OrangeRed";
             }
         }
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -109,6 +111,16 @@ namespace Project_01.Models
             {
                 _isPositive = value;
                 OnPropertyChanged("IsPositive");
+            }
+        }
+        private string _color { get; set; }
+        public string Color
+        {
+            get { return _color; }
+            set
+            {
+                _color = value;
+                OnPropertyChanged("Color");
             }
         }
     }

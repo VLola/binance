@@ -1,5 +1,6 @@
 ﻿using Binance.Net.Clients;
 using Binance.Net.Enums;
+using Binance.Net.Interfaces;
 using Binance.Net.Interfaces.Clients.UsdFuturesApi;
 using CryptoExchange.Net.CommonObjects;
 using Project_01.Command;
@@ -70,26 +71,29 @@ namespace Project_01.ViewModels
                     _chartView.Dispatcher.Invoke(new Action(() => {
                         if(ChartModel.Candles.Count > 0) ChartModel.Candles.Clear();
                     }));
-                    var result = client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: ChartModel.SelectedSymbol, interval: KlineInterval.OneMinute, limit: 499).Result;
-                    if (result.Success)
+
+                    DateTime endTime = DateTime.Now;
+                    DateTime startTime = endTime.AddMinutes(-300);
+                    List<IBinanceKline> list = new();
+                    for (int i = 0; i < 5; i++)
                     {
-                        decimal maxHighPrice = 0m;
-                        int openTime = 0;
-                        var list = result.Data.ToList();
-                        list.Reverse();
-                        foreach (var it in list)
+                        var result = client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: ChartModel.SelectedSymbol, interval: KlineInterval.OneMinute, startTime: startTime, endTime: endTime).Result;
+                        if (result.Success)
                         {
-                            if (maxHighPrice < it.HighPrice) maxHighPrice = it.HighPrice;
+                            List<IBinanceKline> temp = result.Data.ToList();
+                            temp.Reverse();
+                            foreach (var item in temp)
+                            {
+                                list.Add(item);
+                            }
+                            endTime = endTime.AddMinutes(-300);
+                            startTime = startTime.AddMinutes(-300);
                         }
-                        foreach (var it in list)
-                        {
-                            _chartView.Dispatcher.Invoke(new Action(() => { 
-                                ChartModel.Candles.Insert(0, new(maxHighPrice, openTime, it.OpenPrice, it.ClosePrice, it.LowPrice, it.HighPrice));
-                            }));
-                            openTime += 7;
-                        }
-                        Run();
                     }
+                    
+
+                    AddCandles(list);
+                    Run();
                 }
 
                 catch (Exception e)
@@ -97,6 +101,23 @@ namespace Project_01.ViewModels
 
                 }
             });
+        }
+        private void AddCandles(List<IBinanceKline> list)
+        {
+            int openTime = 0;
+            decimal maxHighPrice = 0m;
+            foreach (var it in list)
+            {
+                if (maxHighPrice < it.HighPrice) maxHighPrice = it.HighPrice;
+            }
+            foreach (var it in list)
+            {
+                _chartView.Dispatcher.Invoke(new Action(() => {
+                    ChartModel.Candles.Insert(0, new(maxHighPrice, openTime, it.CloseTime, it.OpenPrice, it.ClosePrice, it.LowPrice, it.HighPrice));
+                }));
+                openTime += 7;
+            }
+
         }
         private async void Run()
         {

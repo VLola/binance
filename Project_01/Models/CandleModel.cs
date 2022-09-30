@@ -8,9 +8,10 @@ namespace Project_01.Models
 {
     public class CandleModel: INotifyPropertyChanged
     {
-        public CandleModel(decimal maxHighPrice, double openTime, decimal openPrice, decimal closePrice, decimal lowPrice, decimal highPrice)
+        public CandleModel(decimal maxHighPrice, double openTime, DateTime closeTime, decimal openPrice, decimal closePrice, decimal lowPrice, decimal highPrice)
         {
             OpenTime = openTime;
+            CloseTime = closeTime;
             decimal mul = 100m / maxHighPrice;
             decimal X = 200m;
             decimal minus = 97m;
@@ -61,6 +62,16 @@ namespace Project_01.Models
             {
                 _openTime = value;
                 OnPropertyChanged("OpenTime");
+            }
+        }
+        private DateTime _closeTime { get; set; }
+        public DateTime CloseTime
+        {
+            get { return _closeTime; }
+            set
+            {
+                _closeTime = value;
+                OnPropertyChanged("CloseTime");
             }
         }
         private decimal _openPrice { get; set; }
@@ -123,5 +134,6 @@ namespace Project_01.Models
                 OnPropertyChanged("Color");
             }
         }
+
     }
 }

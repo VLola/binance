@@ -81,7 +81,7 @@
                     <ItemsControl ItemsSource="{Binding Path=ChartModel.Candles}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Rectangle Width="6" Height="{Binding ClosePrice}" Margin="-2 0 2 0">
+                                <Rectangle Width="6" Height="{Binding ClosePrice}" Margin="-2 0 2 0" ToolTip="{Binding CloseTime}">
                                     <Shape.Style>
                                         <Style TargetType="Shape">
                                             <Setter Property="Stroke" Value="{Binding Color}" />

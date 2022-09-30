@@ -28,84 +28,78 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" x:Name="Chart_new">
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                <Grid x:Name="Chart" HorizontalAlignment="Right">
+                    <Grid x:Name="Chart1" HorizontalAlignment="Left" Background="#FF3C3C3C">
+                        <Grid.RenderTransform>
+                            <ScaleTransform x:Name="player1Scale" ScaleY="1"/>
+                        </Grid.RenderTransform>
+                        <!--Тень свечи-->
+                        <ItemsControl ItemsSource="{Binding Path=ChartModel.Candles}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Rectangle Width="2" Height="{Binding HighPrice}">
+                                        <Shape.Style>
+                                            <Style TargetType="Shape">
+                                                <Setter Property="Stroke" Value="OrangeRed" />
+                                                <Setter Property="Fill" Value="DarkRed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPositive}" Value="True">
+                                                        <Setter Property="Stroke" Value="LawnGreen" />
+                                                        <Setter Property="Fill" Value="ForestGreen" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Shape.Style>
+                                    </Rectangle>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding OpenTime}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding LowPrice}"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                        </ItemsControl>
+                        <!--Тело свечи-->
+                        <ItemsControl ItemsSource="{Binding Path=ChartModel.Candles}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Rectangle Width="6" Height="{Binding ClosePrice}" Margin="-2 0 2 0" ToolTip="{Binding CloseTime}">
+                                        <Shape.Style>
+                                            <Style TargetType="Shape">
+                                                <Setter Property="Stroke" Value="{Binding Color}" />
+                                                <Setter Property="Fill" Value="DarkRed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPositive}" Value="True">
+                                                        <Setter Property="Stroke" Value="{Binding Color}" />
+                                                        <Setter Property="Fill" Value="ForestGreen" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Shape.Style>
+                                    </Rectangle>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding OpenTime}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding OpenPrice}"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                        </ItemsControl>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
         <ComboBox Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Path=ChartModel.Symbols}" SelectedItem="{Binding Path=ChartModel.SelectedSymbol}"/>
         <Button Grid.Row="0" Grid.Column="1" Content="Show" Command="{Binding SelectCommand}"/>
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="Chart_new">
-            <Grid x:Name="Chart" Height="400" HorizontalAlignment="Right" Width="3500">
-                <Grid x:Name="Chart1" Width="3500" HorizontalAlignment="Left" Height="2000" Margin="0,-10000,0,-10000" Background="#FF3C3C3C">
-                    <Grid.RenderTransform>
-                        <ScaleTransform x:Name="player1Scale" ScaleY="1"/>
-                    </Grid.RenderTransform>
-                    <!--Линии-->
-                    <!--<ItemsControl ItemsSource="{Binding Labels}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Rectangle Stroke="Gray" StrokeDashArray="4 8" StrokeThickness="1" Width="3400" Height="1"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemContainerStyle>
-                            <Style TargetType="ContentPresenter">
-                                <Setter Property="Canvas.Top" Value="{Binding}"/>
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
-                    </ItemsControl>-->
-                    <!--Тень свечи-->
-                    <ItemsControl ItemsSource="{Binding Path=ChartModel.Candles}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Rectangle Width="2" Height="{Binding HighPrice}">
-                                    <Shape.Style>
-                                        <Style TargetType="Shape">
-                                            <Setter Property="Stroke" Value="OrangeRed" />
-                                            <Setter Property="Fill" Value="DarkRed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsPositive}" Value="True">
-                                                    <Setter Property="Stroke" Value="LawnGreen" />
-                                                    <Setter Property="Fill" Value="ForestGreen" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Shape.Style>
-                                </Rectangle>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemContainerStyle>
-                            <Style TargetType="ContentPresenter">
-                                <Setter Property="Canvas.Left" Value="{Binding OpenTime}"/>
-                                <Setter Property="Canvas.Top" Value="{Binding LowPrice}"/>
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
-                    </ItemsControl>
-                    <!--Тело свечи-->
-                    <ItemsControl ItemsSource="{Binding Path=ChartModel.Candles}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Rectangle Width="6" Height="{Binding ClosePrice}" Margin="-2 0 2 0" ToolTip="{Binding CloseTime}">
-                                    <Shape.Style>
-                                        <Style TargetType="Shape">
-                                            <Setter Property="Stroke" Value="{Binding Color}" />
-                                            <Setter Property="Fill" Value="DarkRed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsPositive}" Value="True">
-                                                    <Setter Property="Stroke" Value="{Binding Color}" />
-                                                    <Setter Property="Fill" Value="ForestGreen" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Shape.Style>
-                                </Rectangle>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemContainerStyle>
-                            <Style TargetType="ContentPresenter">
-                                <Setter Property="Canvas.Left" Value="{Binding OpenTime}"/>
-                                <Setter Property="Canvas.Top" Value="{Binding OpenPrice}"/>
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
-                    </ItemsControl>
-                </Grid>
-            </Grid>
-        </Grid>
+        <Button Grid.Row="0" Grid.Column="2" Content="+" Click="Button_Click"/>
+        <Button Grid.Row="0" Grid.Column="3" Content="-" Click="Button_Click_1"/>
     </Grid>
 </UserControl>

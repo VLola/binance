@@ -8,19 +8,63 @@ namespace Project_01.Models
 {
     public class CandleModel: INotifyPropertyChanged
     {
-        public CandleModel(decimal maxHighPrice, double openTime, DateTime closeTime, decimal openPrice, decimal closePrice, decimal lowPrice, decimal highPrice)
+        public CandleModel(decimal maxPrice, decimal minPrice, double openTime, DateTime closeTime, decimal openPrice, decimal closePrice, decimal lowPrice, decimal highPrice)
         {
             OpenTime = openTime;
             CloseTime = closeTime;
-            decimal mul = 100m / maxHighPrice;
-            decimal X = 200m;
-            decimal minus = 97m;
-
-
-            decimal high = ((highPrice * mul) - minus) * X;
-            decimal low = ((lowPrice * mul) - minus) * X;
-            decimal open = ((openPrice * mul) - minus) * X;
-            decimal close = ((closePrice * mul) - minus) * X;
+            decimal high = 0m;
+            decimal low = 0m;
+            decimal open = 0m;
+            decimal close = 0m;
+            decimal mul = 1m;
+            if (minPrice > 50000m)
+            {
+                mul = 0.1m;
+            }
+            else if (minPrice > 10000m)
+            {
+                mul = 1m;
+            }
+            else if (minPrice > 1000m)
+            {
+                mul = 10m;
+            }
+            else if (minPrice > 100m)
+            {
+                mul = 100m;
+            }
+            else if (minPrice > 10m)
+            {
+                mul = 1000m;
+            }
+            else if (minPrice > 1m)
+            {
+                mul = 10000m;
+            }
+            else if (minPrice > 0.1m)
+            {
+                mul = 100000m;
+            }
+            else if (minPrice > 0.01m)
+            {
+                mul = 1000000m;
+            }
+            else if (minPrice > 0.001m)
+            {
+                mul = 10000000m;
+            }
+            else if (minPrice > 0.0001m)
+            {
+                mul = 100000000m;
+            }
+            else if (minPrice > 0.00001m)
+            {
+                mul = 1000000000m;
+            }
+            high = (highPrice * mul) - (minPrice * mul);
+            low = (lowPrice * mul) - (minPrice * mul);
+            open = (openPrice * mul) - (minPrice * mul);
+            close = (closePrice * mul) - (minPrice * mul);
 
 
             if (highPrice < lowPrice)

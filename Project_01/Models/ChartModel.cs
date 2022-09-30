@@ -13,6 +13,8 @@ namespace Project_01.Models
         }
         public ObservableCollection<string> Symbols { get; set; } = new();
         public ObservableCollection<CandleModel> Candles { get; set; } = new();
+        public ObservableCollection<CandleModel> ChartCandles { get; set; } = new();
+        public ObservableCollection<ObservableCollection<CandleModel>> ListsCandles { get; set; } = new();
 
         private string _selectedSymbol { get; set; }
         public string SelectedSymbol

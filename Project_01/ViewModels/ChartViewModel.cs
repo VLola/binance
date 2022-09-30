@@ -68,8 +68,9 @@ namespace Project_01.ViewModels
             {
                 try
                 {
-                    _chartView.Dispatcher.Invoke(new Action(() => {
-                        if(ChartModel.Candles.Count > 0) ChartModel.Candles.Clear();
+                    _chartView.Dispatcher.Invoke(new Action(() =>
+                    {
+                        if (ChartModel.Candles.Count > 0) ChartModel.Candles.Clear();
                     }));
 
                     DateTime endTime = DateTime.Now;
@@ -94,6 +95,18 @@ namespace Project_01.ViewModels
 
                     AddCandles(list);
                     Run();
+                    decimal maxPrice = 0m;
+                    foreach (var item in ChartModel.Candles)
+                    {
+                        if ((item.LowPrice + item.HighPrice) > maxPrice) maxPrice = item.LowPrice + item.HighPrice;
+                    }
+
+                    _chartView.Dispatcher.Invoke(new Action(() => {
+                        _chartView.player1Scale.ScaleY = Decimal.ToDouble(maxPrice / 10000);
+                        _chartView.Chart1.Width = ChartModel.Candles.Count * 7;
+                        _chartView.Chart1.Height = Decimal.ToDouble(maxPrice / 80);
+                        _chartView.Chart1.Margin = new Thickness(0, _chartView.Chart1.Height * 11, 0, 0);
+                    }));
                 }
 
                 catch (Exception e)
@@ -106,14 +119,17 @@ namespace Project_01.ViewModels
         {
             int openTime = 0;
             decimal maxHighPrice = 0m;
+            decimal minLowPrice = 1000000m;
             foreach (var it in list)
             {
                 if (maxHighPrice < it.HighPrice) maxHighPrice = it.HighPrice;
+                if (minLowPrice > it.LowPrice) minLowPrice = it.LowPrice;
             }
             foreach (var it in list)
             {
-                _chartView.Dispatcher.Invoke(new Action(() => {
-                    ChartModel.Candles.Insert(0, new(maxHighPrice, openTime, it.CloseTime, it.OpenPrice, it.ClosePrice, it.LowPrice, it.HighPrice));
+                _chartView.Dispatcher.Invoke(new Action(() =>
+                {
+                    ChartModel.Candles.Insert(0, new(maxHighPrice, minLowPrice, openTime, it.CloseTime, it.OpenPrice, it.ClosePrice, it.LowPrice, it.HighPrice));
                 }));
                 openTime += 7;
             }
@@ -126,6 +142,7 @@ namespace Project_01.ViewModels
                 _chartView.Dispatcher.Invoke(new Action(() => {
                     for (int i = 0; i < ChartModel.Candles.Count - 3; i++)
                     {
+                        ObservableCollection<CandleModel> list = new();
                         for (int j = 0; j < ChartModel.Candles.Count - 3; j++)
                         {
                             if(i != j && i != j + 1 && i != j + 2 && i != j - 1 && i != j - 2 && ChartModel.Candles[i].ClosePrice != 0m && ChartModel.Candles[i + 1].ClosePrice != 0m && ChartModel.Candles[i + 2].ClosePrice != 0m && ChartModel.Candles[j].ClosePrice != 0m && ChartModel.Candles[j + 1].ClosePrice != 0m && ChartModel.Candles[j + 2].ClosePrice != 0m)
@@ -150,10 +167,14 @@ namespace Project_01.ViewModels
                                         ChartModel.Candles[j].Color = "White";
                                         ChartModel.Candles[j + 1].Color = "White";
                                         ChartModel.Candles[j + 2].Color = "White";
+                                        list.Add(ChartModel.Candles[j]);
+                                        list.Add(ChartModel.Candles[j + 1]);
+                                        list.Add(ChartModel.Candles[j + 2]);
                                     }
                                 }
                             }
                         }
+                        if(list.Count > 0) ChartModel.ListsCandles.Add(list);
                     }
                 }));
             });

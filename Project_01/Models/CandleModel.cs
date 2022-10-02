@@ -8,6 +8,22 @@ namespace Project_01.Models
 {
     public class CandleModel: INotifyPropertyChanged
     {
+        public CandleModel(CandleModel candleModel, double openTime, decimal minOpenPrice, bool isWhite)
+        {
+            OpenTime = openTime;
+            OpenPrice = candleModel.OpenPrice - minOpenPrice;
+            CloseTime = candleModel.CloseTime;
+            ClosePrice = candleModel.ClosePrice;
+            HighPrice = candleModel.HighPrice;
+            LowPrice = candleModel.LowPrice - minOpenPrice;
+            IsPositive = candleModel.IsPositive;
+            if(isWhite) Color = "White";
+            else
+            {
+                if(IsPositive) Color = "LawnGreen";
+                else Color = "OrangeRed";
+            }
+        }
         public CandleModel(decimal maxPrice, decimal minPrice, double openTime, DateTime closeTime, decimal openPrice, decimal closePrice, decimal lowPrice, decimal highPrice)
         {
             OpenTime = openTime;

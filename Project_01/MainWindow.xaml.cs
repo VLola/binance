@@ -1,6 +1,4 @@
-﻿using Project_01.ViewModels;
-using Project_01.Views;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Project_01
 {

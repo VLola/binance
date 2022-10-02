@@ -28,15 +28,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" x:Name="Chart_new">
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                <Grid x:Name="Chart" HorizontalAlignment="Right">
-                    <Grid x:Name="Chart1" HorizontalAlignment="Left" Background="#FF3C3C3C">
+                <Grid Background="#FF3C3C3C">
+                    <Grid Height="{Binding Path=ChartModel.Height}" Width="{Binding Path=ChartModel.Width}" Margin="{Binding Path=ChartModel.Margin}">
                         <Grid.RenderTransform>
-                            <ScaleTransform x:Name="player1Scale" ScaleY="1"/>
+                            <ScaleTransform ScaleY="{Binding Path=ChartModel.ScaleY}"/>
                         </Grid.RenderTransform>
                         <!--Тень свечи-->
                         <ItemsControl ItemsSource="{Binding Path=ChartModel.Candles}">
@@ -96,10 +94,7 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-
-        <ComboBox Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Path=ChartModel.Symbols}" SelectedItem="{Binding Path=ChartModel.SelectedSymbol}"/>
-        <Button Grid.Row="0" Grid.Column="1" Content="Show" Command="{Binding SelectCommand}"/>
-        <Button Grid.Row="0" Grid.Column="2" Content="+" Click="Button_Click"/>
-        <Button Grid.Row="0" Grid.Column="3" Content="-" Click="Button_Click_1"/>
+        <Button Grid.Row="0" Grid.Column="0" Content="+" Command="{Binding Path=ChartModel.IncreaseCommand}"/>
+        <Button Grid.Row="0" Grid.Column="1" Content="-" Command="{Binding Path=ChartModel.DecreaseCommand}"/>
     </Grid>
 </UserControl>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,17 @@ namespace Project_02.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
+        public ObservableCollection<string> Clients { get; set; } = new();
+        private string _selectedClient { get; set; }
+        public string SelectedClient
+        {
+            get { return _selectedClient; }
+            set
+            {
+                _selectedClient = value;
+                OnPropertyChanged("SelectedClient");
+            }
+        }
         private bool _isLogin { get; set; }
         public bool IsLogin
         {
@@ -23,6 +35,46 @@ namespace Project_02.Models
             {
                 _isLogin = value;
                 OnPropertyChanged("IsLogin");
+            }
+        }
+        private bool _isReal { get; set; }
+        public bool IsReal
+        {
+            get { return _isReal; }
+            set
+            {
+                _isReal = value;
+                OnPropertyChanged("IsReal");
+            }
+        }
+        private string _name { get; set; }
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                OnPropertyChanged("Name");
+            }
+        }
+        private string _apiKey { get; set; }
+        public string ApiKey
+        {
+            get { return _apiKey; }
+            set
+            {
+                _apiKey = value;
+                OnPropertyChanged("ApiKey");
+            }
+        }
+        private string _secretKey { get; set; }
+        public string SecretKey
+        {
+            get { return _secretKey; }
+            set
+            {
+                _secretKey = value;
+                OnPropertyChanged("SecretKey");
             }
         }
     }

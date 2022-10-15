@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_02.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ namespace Project_02.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
-        public ObservableCollection<string> Clients { get; set; } = new();
+        public ObservableCollection<SymbolViewModel> Symbols { get; set; } = new();
         private string _selectedClient { get; set; }
         public string SelectedClient
         {
@@ -75,6 +76,16 @@ namespace Project_02.Models
             {
                 _secretKey = value;
                 OnPropertyChanged("SecretKey");
+            }
+        }
+        private bool _selectAll { get; set; }
+        public bool SelectAll
+        {
+            get { return _selectAll; }
+            set
+            {
+                _selectAll = value;
+                OnPropertyChanged("SelectAll");
             }
         }
     }

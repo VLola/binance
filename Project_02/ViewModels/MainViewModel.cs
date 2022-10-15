@@ -1,73 +1,179 @@
-﻿using Project_02.Command;
+﻿using Binance.Net.Clients;
+using Binance.Net.Objects;
+using Binance.Net.Objects.Models.Spot;
+using CryptoExchange.Net.Authentication;
+using CryptoExchange.Net.Interfaces;
+using Newtonsoft.Json;
+using Project_02.Command;
 using Project_02.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Shapes;
 
 namespace Project_02.ViewModels
 {
     internal class MainViewModel
     {
-        private string _pathClients = Directory.GetCurrentDirectory() + @"\clients\";
+        private string _link = "https://drive.google.com/u/0/uc?id=13RLR9SIMLL2ibwDh8ouByOElk6Yw784J&export=download";
+        private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         public MainModel MainModel { get; set; } = new();
+        private BinanceClient? _client { get; set; }
+        private BinanceSocketClient? _socketClient { get; set; }
         private RelayCommand? _loginCommand;
         public RelayCommand LoginCommand
         {
             get { return _loginCommand ?? (_loginCommand = new RelayCommand(obj => { LoginClient(); })); }
         }
-        private RelayCommand? _saveCommand;
-        public RelayCommand SaveCommand
-        {
-            get { return _saveCommand ?? (_saveCommand = new RelayCommand(obj => { SaveClient(); })); }
-        }
         public MainViewModel()
         {
-            LoadClients();
-        }
-        private void SaveClient()
-        {
-            if (!Directory.Exists(_pathClients)) Directory.CreateDirectory(_pathClients);
-            Client client = new();
-            client.Name = MainModel.Name;
-            client.ApiKey = MainModel.ApiKey;
-            client.SecretKey = MainModel.SecretKey;
-            client.IsReal = MainModel.IsReal;
-            string fileName;
-            if (MainModel.IsReal) fileName = MainModel.Name + "-real";
-            else fileName = MainModel.Name + "-test";
-            File.WriteAllText(_pathClients + fileName, JsonSerializer.Serialize(client));
-            MainModel.Name = "";
-            MainModel.ApiKey = "";
-            MainModel.SecretKey = "";
-            LoadClients();
+            if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
+            MainModel.PropertyChanged += MainModel_PropertyChanged;
         }
         private void LoginClient()
         {
-            if (!Directory.Exists(_pathClients)) Directory.CreateDirectory(_pathClients);
-            Client? client = JsonSerializer.Deserialize<Client>(File.ReadAllText(_pathClients + MainModel.SelectedClient));
-            if(client != null)
+            using (var client = new WebClient())
             {
-                MessageBox.Show(client.Name);
-            }
-        }
-        private void LoadClients()
-        {
-            if (!Directory.Exists(_pathClients)) Directory.CreateDirectory(_pathClients);
-            MainModel.Clients.Clear();
-            List<string> filesDir = (from file in Directory.GetFiles(_pathClients) select Path.GetFileName(file)).ToList();
-            if(filesDir.Count > 0)
-            {
-                foreach (var item in filesDir)
+                string json = client.DownloadString(_link);
+                List<ClientModel>? clientModels = JsonConvert.DeserializeObject<List<ClientModel>>(json);
+                if (clientModels != null)
                 {
-                    MainModel.Clients.Add(item);
+                    bool check = false;
+                    foreach (var item in clientModels)
+                    {
+                        if (item.ClientName == MainModel.Name) check = item.Access;
+                    }
+                    if (check)
+                    {
+                        Load();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Login name failed!");
+                    }
                 }
-                MainModel.SelectedClient = MainModel.Clients[0];
             }
         }
+        private void Load()
+        {
+            if (!MainModel.IsReal)
+            {
+                // ------------- Test Api ----------------
+                BinanceClientOptions clientOption = new();
+                clientOption.UsdFuturesApiOptions.BaseAddress = "https://testnet.binancefuture.com";
+                _client = new(clientOption);
+
+                BinanceSocketClientOptions socketClientOption = new BinanceSocketClientOptions
+                {
+                    AutoReconnect = true,
+                    ReconnectInterval = TimeSpan.FromMinutes(1)
+                };
+                socketClientOption.UsdFuturesStreamsOptions.BaseAddress = "wss://stream.binancefuture.com";
+                _socketClient = new BinanceSocketClient(socketClientOption);
+                // ------------- Test Api ----------------
+            }
+            else
+            {
+                // ------------- Real Api ----------------
+                _client = new();
+                _socketClient = new();
+                // ------------- Real Api ----------------
+            }
+
+            try
+            {
+                _client.SetApiCredentials(new ApiCredentials(MainModel.ApiKey, MainModel.SecretKey));
+                _socketClient.SetApiCredentials(new ApiCredentials(MainModel.ApiKey, MainModel.SecretKey));
+
+                MainModel.ApiKey = "";
+                MainModel.SecretKey = "";
+                if (CheckLogin())
+                {
+                    MainModel.IsLogin = true;
+                    GetSumbolName();
+                }
+                else MessageBox.Show("Login failed!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private bool CheckLogin()
+        {
+            try
+            {
+                var result = _client.UsdFuturesApi.Account.GetAccountInfoAsync().Result;
+                if (!result.Success)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void MainModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "SelectAll")
+            {
+                foreach (var item in MainModel.Symbols)
+                {
+                    item.Symbol.Select = MainModel.SelectAll;
+                }
+            }
+        }
+        #region - List Sumbols -
+        private void GetSumbolName()
+        {
+            List<string> list = new();
+            foreach (var it in ListSymbols())
+            {
+                list.Add(it.Symbol);
+            }
+            list.Sort();
+            foreach (var it in list)
+            {
+                SymbolViewModel symbolViewModel = new(_client, _socketClient, it);
+                MainModel.Symbols.Add(symbolViewModel);
+            }
+        }
+        private List<BinancePrice> ListSymbols()
+        {
+            try
+            {
+                var result = _client.UsdFuturesApi.ExchangeData.GetPricesAsync().Result;
+                if (!result.Success) WriteLog($"Failed Success ListSymbols: {result.Error?.Message}");
+                return result.Data.ToList();
+            }
+            catch (Exception ex)
+            {
+                WriteLog($"Failed ListSymbols: {ex.Message}");
+                return null;
+            }
+        }
+        #endregion
+
+        private void WriteLog(string text)
+        {
+            try
+            {
+                File.AppendAllText(_pathLog + "_MAIN_LOG", $"{DateTime.Now} {text}\n");
+            }
+            catch { }
+        }
+
     }
 }

@@ -7,6 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <Style TargetType="TextBlock" x:Key="styleTextBlockMain">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
         <Style TargetType="TextBlock" x:Key="styleTextBlockLogin">
             <Setter Property="Margin" Value="5"/>
         </Style>
@@ -27,6 +30,10 @@
         <Style TargetType="CheckBox" x:Key="styleCheckBoxLogin">
             <Setter Property="Margin" Value="5"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="CheckBox" x:Key="styleCheckBoxMain">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
         </Style>
         <Style TargetType="Grid" x:Key="styleGridLogin">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -50,48 +57,60 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <Grid>
+        <Grid Style="{StaticResource styleGridLogin}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Style="{StaticResource styleGridLogin}">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Style="{StaticResource styleTextBlockLogin}"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=MainModel.Name}" Style="{StaticResource styleTextBoxLogin}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Api key:" Style="{StaticResource styleTextBlockLogin}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=MainModel.ApiKey}" Style="{StaticResource styleTextBoxLogin}"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Secret key:" Style="{StaticResource styleTextBlockLogin}"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=MainModel.SecretKey}" Style="{StaticResource styleTextBoxLogin}"/>
+            <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Real" IsChecked="{Binding Path=MainModel.IsReal}" Style="{StaticResource styleCheckBoxLogin}"/>
+            <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Login" Command="{Binding Path=LoginCommand}" Style="{StaticResource styleButtonLogin}"/>
+        </Grid>
+        <Grid Style="{StaticResource styleGridMain}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderThickness="1" BorderBrush="Black"/>
+            <Border Grid.Row="1" BorderThickness="1" BorderBrush="Black"/>
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Style="{StaticResource styleTextBlockLogin}"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=MainModel.Name}" Style="{StaticResource styleTextBoxLogin}"/>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Api key:" Style="{StaticResource styleTextBlockLogin}"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=MainModel.ApiKey}" Style="{StaticResource styleTextBoxLogin}"/>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Secret key:" Style="{StaticResource styleTextBlockLogin}"/>
-                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=MainModel.SecretKey}" Style="{StaticResource styleTextBoxLogin}"/>
-                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Real" IsChecked="{Binding Path=MainModel.IsReal}" Style="{StaticResource styleCheckBoxLogin}"/>
-                <!--<Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <RadioButton Grid.Column="0" Content="Real" IsChecked="{Binding Path=MainModel.IsReal}" Style="{StaticResource styleRadioButtonLogin}"/>
-                    <RadioButton Grid.Column="1" Content="Testnet" IsChecked="{Binding Path=MainModel.IsTest}" Style="{StaticResource styleRadioButtonLogin}"/>
-                </Grid>-->
-                <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Save" Command="{Binding Path=SaveCommand}" Style="{StaticResource styleButtonLogin}"/>
+                <CheckBox Grid.Column="0" Content="Select all" IsChecked="{Binding Path=MainModel.SelectAll}" Style="{StaticResource styleCheckBoxMain}"/>
             </Grid>
-            <Grid Grid.Row="1" Style="{StaticResource styleGridLogin}">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" Style="{StaticResource styleComboBoxLogin}" ItemsSource="{Binding Path=MainModel.Clients}" SelectedItem="{Binding Path=MainModel.SelectedClient}"/>
-                <Button Grid.Row="1" Content="Login" Command="{Binding Path=LoginCommand}" Style="{StaticResource styleButtonLogin}"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Select" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="1" Text="Symbol" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="2" Text="Status" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="3" Text="Price" Style="{StaticResource styleTextBlockMain}"/>
             </Grid>
+            <ListBox Grid.Row="2" ItemsSource="{Binding Path=MainModel.Symbols}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:SymbolView/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
     </Grid>
 </UserControl>

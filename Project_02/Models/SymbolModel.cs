@@ -1,11 +1,8 @@
-﻿using Binance.Net.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_02.Models
 {
@@ -16,8 +13,22 @@ namespace Project_02.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
-        public List<long> PricesNew = new();
-        public List<long> PricesOld = new();
+        public List<Price> Prices = new();
+        public List<Order> Orders = new();
+        public void AddPrice(Price price)
+        {
+            Prices.Add(price);
+            Prices.ForEach(price => {
+                if (price.Time < Time.AddMinutes(-1)) {
+                    price.NotValid = true;
+                }
+            });
+            Prices.RemoveAll(prices => prices.NotValid == true);
+            AveragePrice = Prices.Sum(price => price.Value) / Prices.Count;
+            decimal min = AveragePrice < price.Value ? AveragePrice : price.Value;
+            decimal max = AveragePrice > price.Value ? AveragePrice : price.Value;
+            Delta = Math.Round(((max / min) - 1) * 1000, 1);
+        }
         private string _name { get; set; }
         public string Name
         {
@@ -48,6 +59,16 @@ namespace Project_02.Models
                 OnPropertyChanged("Price");
             }
         }
+        private DateTime _time { get; set; }
+        public DateTime Time
+        {
+            get { return _time; }
+            set
+            {
+                _time = value;
+                OnPropertyChanged("Time");
+            }
+        }
         private bool _run { get; set; }
         public bool Run
         {
@@ -56,6 +77,36 @@ namespace Project_02.Models
             {
                 _run = value;
                 OnPropertyChanged("Run");
+            }
+        }
+        private decimal _deltan { get; set; }
+        public decimal Delta
+        {
+            get { return _deltan; }
+            set
+            {
+                _deltan = value;
+                OnPropertyChanged("Delta");
+            }
+        }
+        private decimal _averagePrice { get; set; }
+        public decimal AveragePrice
+        {
+            get { return _averagePrice; }
+            set
+            {
+                _averagePrice = value;
+                OnPropertyChanged("AveragePrice");
+            }
+        }
+        private bool _isOpenOrder { get; set; }
+        public bool IsOpenOrder
+        {
+            get { return _isOpenOrder; }
+            set
+            {
+                _isOpenOrder = value;
+                OnPropertyChanged("IsOpenOrder");
             }
         }
     }

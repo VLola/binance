@@ -98,11 +98,13 @@
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Select" Style="{StaticResource styleTextBlockMain}"/>
                 <TextBlock Grid.Column="1" Text="Symbol" Style="{StaticResource styleTextBlockMain}"/>
                 <TextBlock Grid.Column="2" Text="Status" Style="{StaticResource styleTextBlockMain}"/>
                 <TextBlock Grid.Column="3" Text="Price" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="4" Text="Delta" Style="{StaticResource styleTextBlockMain}"/>
             </Grid>
             <ListBox Grid.Row="2" ItemsSource="{Binding Path=MainModel.Symbols}">
                 <ListBox.ItemTemplate>

@@ -1,5 +1,8 @@
 ﻿using Binance.Net.Clients;
+using Binance.Net.Objects.Models.Spot;
+using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Sockets;
+using Newtonsoft.Json;
 using Project_02.Models;
 using System;
 using System.Collections.Generic;
@@ -33,6 +36,43 @@ namespace Project_02.ViewModels
                 if (Symbol.Select) SubscribeToAggregatedTradeUpdatesAsync();
                 else UnsubscribeAsync();
             }
+            else if (e.PropertyName == "Delta")
+            {
+                if (!Symbol.IsOpenOrder && Symbol.Delta > 10m)
+                {
+                    Symbol.IsOpenOrder = true;
+                    Models.Order order = new Models.Order();
+                    order.OpenPrice = Symbol.Price;
+                    order.OpenTime = Symbol.Time;
+                    if (Symbol.Price > Symbol.AveragePrice) order.PositionSide = "Short";
+                    else order.PositionSide = "Long";
+                    Symbol.Orders.Add(order);
+                    //WriteLog($"- {Symbol.Time} - {Symbol.Price}");
+                }
+                //else if (Symbol.IsOpenOrder && Symbol.Delta < 0.1m)
+                //{
+                //    Symbol.IsOpenOrder = false;
+                //}
+            }
+            else if (e.PropertyName == "Time")
+            {
+                Symbol.Orders.ForEach(order =>
+                {
+                    if (!order.IsClose)
+                    {
+                        if(order.OpenTime < Symbol.Time.AddMinutes(-7))
+                        {
+                            order.IsClose = true;
+                            order.ClosePrice = Symbol.Price;
+                            order.CloseTime = Symbol.Time;
+                            if(order.PositionSide == "Short") order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
+                            else order.Profit = (order.ClosePrice - order.OpenPrice) / order.OpenPrice;
+                            WriteLog(JsonConvert.SerializeObject(order));
+                            Symbol.IsOpenOrder = false;
+                        }
+                    }
+                });
+            }
         }
         private async void SubscribeToAggregatedTradeUpdatesAsync()
         {
@@ -41,14 +81,17 @@ namespace Project_02.ViewModels
                 var result = await _socketClient.UsdFuturesStreams.SubscribeToAggregatedTradeUpdatesAsync(Symbol.Name, Message =>
                 {
                     Symbol.Price = Message.Data.Price;
-                    if (Symbol.Run)
-                    {
-                        // My algorithm
-                    }
-                    else
-                    {
+                    Symbol.Time = Message.Data.TradeTime;
+                    Symbol.AddPrice(new Price() { Value = Message.Data.Price, Time = Message.Data.TradeTime });
+                    
+                    //if (Symbol.Run)
+                    //{
+                    //    // My algorithm
+                    //}
+                    //else
+                    //{
 
-                    }
+                    //}
                 });
                 if (!result.Success) WriteLog($"Failed Success SubscribeToAggregatedTradeUpdatesAsync: {result.Error?.Message}");
                 else

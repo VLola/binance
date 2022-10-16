@@ -22,10 +22,12 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="50"/>
             <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
         <CheckBox Grid.Column="0" IsChecked="{Binding Path=Symbol.Select}"/>
         <TextBlock Grid.Column="1" Text="{Binding Path=Symbol.Name}"/>
         <TextBlock Grid.Column="2" Style="{StaticResource styleStatus}"/>
         <TextBlock Grid.Column="3" Text="{Binding Path=Symbol.Price}"/>
+        <TextBlock Grid.Column="4" Text="{Binding Path=Symbol.Delta}"/>
     </Grid>
 </UserControl>

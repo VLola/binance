@@ -10,6 +10,7 @@ namespace Project_02.Models
         public DateTime CloseTime { get; set; }
         public string PositionSide { get; set; }
         public decimal Profit { get; set; }
+        public decimal Delta { get; set; }
         public bool IsClose { get; set; }
     }
 }

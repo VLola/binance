@@ -10,11 +10,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace Project_02.ViewModels
 {
     internal class SymbolViewModel
     {
+        public DispatcherTimer timer = new DispatcherTimer();
         private UpdateSubscription? _updateSubscription { get; set; }
         public SymbolModel Symbol { get; set; }
         private BinanceSocketClient _socketClient { get; set; }
@@ -27,6 +29,12 @@ namespace Project_02.ViewModels
             _socketClient = socketClient;
             Symbol.Name = symbolName;
             Symbol.PropertyChanged += Symbol_PropertyChanged;
+            timer.Interval = TimeSpan.FromMinutes(60);
+            timer.Tick += Timer_Tick;
+        }
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if(Symbol.MaxDelta > 4m) Symbol.MaxDelta -= 1m;
         }
 
         private void Symbol_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -38,21 +46,19 @@ namespace Project_02.ViewModels
             }
             else if (e.PropertyName == "Delta")
             {
-                if (!Symbol.IsOpenOrder && Symbol.Delta > 10m)
+                if (!Symbol.IsOpenOrder && Symbol.Delta > Symbol.MaxDelta)
                 {
                     Symbol.IsOpenOrder = true;
                     Models.Order order = new Models.Order();
                     order.OpenPrice = Symbol.Price;
                     order.OpenTime = Symbol.Time;
+                    order.IsClose = false;
+                    order.Delta = Symbol.MaxDelta;
                     if (Symbol.Price > Symbol.AveragePrice) order.PositionSide = "Short";
                     else order.PositionSide = "Long";
                     Symbol.Orders.Add(order);
-                    //WriteLog($"- {Symbol.Time} - {Symbol.Price}");
+                    Symbol.MaxDelta += 1m;
                 }
-                //else if (Symbol.IsOpenOrder && Symbol.Delta < 0.1m)
-                //{
-                //    Symbol.IsOpenOrder = false;
-                //}
             }
             else if (e.PropertyName == "Time")
             {
@@ -67,7 +73,7 @@ namespace Project_02.ViewModels
                             order.CloseTime = Symbol.Time;
                             if(order.PositionSide == "Short") order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
                             else order.Profit = (order.ClosePrice - order.OpenPrice) / order.OpenPrice;
-                            WriteLog(JsonConvert.SerializeObject(order));
+                            WriteLog($"Profit all - {Symbol.Orders.Sum(order=> order.Profit)} - {JsonConvert.SerializeObject(order)}");
                             Symbol.IsOpenOrder = false;
                         }
                     }

@@ -79,14 +79,24 @@ namespace Project_02.Models
                 OnPropertyChanged("Run");
             }
         }
-        private decimal _deltan { get; set; }
+        private decimal _delta { get; set; }
         public decimal Delta
         {
-            get { return _deltan; }
+            get { return _delta; }
             set
             {
-                _deltan = value;
+                _delta = value;
                 OnPropertyChanged("Delta");
+            }
+        }
+        private decimal _maxDelta { get; set; } = 8m;
+        public decimal MaxDelta
+        {
+            get { return _maxDelta; }
+            set
+            {
+                _maxDelta = value;
+                OnPropertyChanged("MaxDelta");
             }
         }
         private decimal _averagePrice { get; set; }

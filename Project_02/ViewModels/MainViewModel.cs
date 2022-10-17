@@ -2,6 +2,7 @@
 using Binance.Net.Objects;
 using Binance.Net.Objects.Models.Spot;
 using CryptoExchange.Net.Authentication;
+using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Interfaces;
 using Newtonsoft.Json;
 using Project_02.Command;
@@ -15,6 +16,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace Project_02.ViewModels
@@ -31,10 +33,50 @@ namespace Project_02.ViewModels
         {
             get { return _loginCommand ?? (_loginCommand = new RelayCommand(obj => { LoginClient(); })); }
         }
+        private RelayCommand? _calculateCommand;
+        public RelayCommand CalculateCommand
+        {
+            get { return _calculateCommand ?? (_calculateCommand = new RelayCommand(obj => { Calculate(); })); }
+        }
         public MainViewModel()
         {
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
             MainModel.PropertyChanged += MainModel_PropertyChanged;
+        }
+        private void Calculate()
+        {
+            MainModel.BetPlus = 0;
+            MainModel.BetMinus = 0;
+            MainModel.ProfitPlus = 0m;
+            MainModel.ProfitMinus = 0m;
+            MainModel.AveragePriceOrder = 0m;
+            foreach (var item in MainModel.Symbols)
+            {
+                if(item.Symbol.Orders.Count > 0)
+                {
+                    foreach (var it in item.Symbol.Orders)
+                    {
+                        if (it.IsClose)
+                        {
+                            if (it.Profit >= 0m)
+                            {
+                                MainModel.BetPlus += 1;
+                                MainModel.ProfitPlus += it.Profit;
+                            }
+                            else
+                            {
+                                MainModel.BetMinus += 1;
+                                MainModel.ProfitMinus += it.Profit;
+                            }
+                        }
+                    }
+                }
+            }
+            if((MainModel.BetPlus + MainModel.BetMinus) > 0) MainModel.AveragePriceOrder = (MainModel.ProfitPlus + MainModel.ProfitMinus) / (MainModel.BetPlus + MainModel.BetMinus);
+
+            MainModel.ProfitPlus = Math.Round(MainModel.ProfitPlus, 5);
+            MainModel.ProfitMinus = Math.Round(MainModel.ProfitMinus, 5);
+            MainModel.AveragePriceOrder = Math.Round(MainModel.AveragePriceOrder, 5);
         }
         private void LoginClient()
         {

@@ -29,12 +29,13 @@ namespace Project_02.ViewModels
             _socketClient = socketClient;
             Symbol.Name = symbolName;
             Symbol.PropertyChanged += Symbol_PropertyChanged;
-            timer.Interval = TimeSpan.FromMinutes(60);
+            timer.Interval = TimeSpan.FromMinutes(30);
             timer.Tick += Timer_Tick;
+            timer.Start();
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if(Symbol.MaxDelta > 4m) Symbol.MaxDelta -= 1m;
+            if(Symbol.MaxDelta > 3m) Symbol.MaxDelta -= 1m;
         }
 
         private void Symbol_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -54,7 +55,7 @@ namespace Project_02.ViewModels
                     order.OpenTime = Symbol.Time;
                     order.IsClose = false;
                     order.Delta = Symbol.MaxDelta;
-                    if (Symbol.Price > Symbol.AveragePrice) order.PositionSide = "Short";
+                    if (Symbol.Price < Symbol.AveragePrice) order.PositionSide = "Short";
                     else order.PositionSide = "Long";
                     Symbol.Orders.Add(order);
                     Symbol.MaxDelta += 1m;
@@ -66,7 +67,7 @@ namespace Project_02.ViewModels
                 {
                     if (!order.IsClose)
                     {
-                        if(order.OpenTime < Symbol.Time.AddMinutes(-7))
+                        if(order.OpenTime < Symbol.Time.AddMinutes(-1))
                         {
                             order.IsClose = true;
                             order.ClosePrice = Symbol.Price;

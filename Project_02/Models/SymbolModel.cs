@@ -89,7 +89,7 @@ namespace Project_02.Models
                 OnPropertyChanged("Delta");
             }
         }
-        private decimal _maxDelta { get; set; } = 8m;
+        private decimal _maxDelta { get; set; } = 4m;
         public decimal MaxDelta
         {
             get { return _maxDelta; }

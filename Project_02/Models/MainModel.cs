@@ -88,5 +88,56 @@ namespace Project_02.Models
                 OnPropertyChanged("SelectAll");
             }
         }
+        private int _betPlus { get; set; }
+        public int BetPlus
+        {
+            get { return _betPlus; }
+            set
+            {
+                _betPlus = value;
+                OnPropertyChanged("BetPlus");
+            }
+        }
+        private int _betMinus { get; set; }
+        public int BetMinus
+        {
+            get { return _betMinus; }
+            set
+            {
+                _betMinus = value;
+                OnPropertyChanged("BetMinus");
+            }
+        }
+        private decimal _profitPlus { get; set; }
+        public decimal ProfitPlus
+        {
+            get { return _profitPlus; }
+            set
+            {
+                _profitPlus = value;
+                OnPropertyChanged("ProfitPlus");
+            }
+        }
+        private decimal _profitMinus { get; set; }
+        public decimal ProfitMinus
+        {
+            get { return _profitMinus; }
+            set
+            {
+                _profitMinus = value;
+                OnPropertyChanged("ProfitMinus");
+            }
+        }
+
+        private decimal _averagePriceOrder { get; set; }
+        public decimal AveragePriceOrder
+        {
+            get { return _averagePriceOrder; }
+            set
+            {
+                _averagePriceOrder = value;
+                OnPropertyChanged("AveragePriceOrder");
+            }
+        }
     }
 }

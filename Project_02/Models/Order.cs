@@ -6,6 +6,7 @@ namespace Project_02.Models
     {
         public decimal OpenPrice { get; set; }
         public decimal ClosePrice { get; set; }
+        public decimal Price { get; set; }
         public DateTime OpenTime { get; set; }
         public DateTime CloseTime { get; set; }
         public string PositionSide { get; set; }

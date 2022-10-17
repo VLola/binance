@@ -29,57 +29,94 @@ namespace Project_02.ViewModels
             _socketClient = socketClient;
             Symbol.Name = symbolName;
             Symbol.PropertyChanged += Symbol_PropertyChanged;
-            timer.Interval = TimeSpan.FromMinutes(30);
+            timer.Interval = TimeSpan.FromMinutes(1);
             timer.Tick += Timer_Tick;
             timer.Start();
+            SubscribeToAggregatedTradeUpdatesAsync();
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if(Symbol.MaxDelta > 3m) Symbol.MaxDelta -= 1m;
+            if(Symbol.Price > 0m)
+            {
+
+                if (Symbol.Select)
+                {
+                    Models.Order order = new Models.Order();
+                    order.OpenPrice = Symbol.Price;
+                    order.OpenTime = Symbol.Time;
+                    order.IsClose = false;
+                    order.PositionSide = "Long";
+                    order.Price = (Symbol.Price + (Symbol.Price * 0.005m));
+
+                    Models.Order order1 = new Models.Order();
+                    order1.OpenPrice = Symbol.Price;
+                    order1.OpenTime = Symbol.Time;
+                    order1.IsClose = false;
+                    order1.PositionSide = "Short";
+                    order1.Price = (Symbol.Price - (Symbol.Price * 0.005m));
+
+                    Symbol.Orders.Add(order);
+                    Symbol.Orders.Add(order1);
+                }
+            }
         }
 
         private void Symbol_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Select")
             {
-                if (Symbol.Select) SubscribeToAggregatedTradeUpdatesAsync();
-                else UnsubscribeAsync();
-            }
-            else if (e.PropertyName == "Delta")
-            {
-                if (!Symbol.IsOpenOrder && Symbol.Delta > Symbol.MaxDelta)
+                //if (Symbol.Select) SubscribeToAggregatedTradeUpdatesAsync();
+                //else UnsubscribeAsync();
+                if (!Symbol.Select)
                 {
-                    Symbol.IsOpenOrder = true;
-                    Models.Order order = new Models.Order();
-                    order.OpenPrice = Symbol.Price;
-                    order.OpenTime = Symbol.Time;
-                    order.IsClose = false;
-                    order.Delta = Symbol.MaxDelta;
-                    if (Symbol.Price < Symbol.AveragePrice) order.PositionSide = "Short";
-                    else order.PositionSide = "Long";
-                    Symbol.Orders.Add(order);
-                    Symbol.MaxDelta += 1m;
-                }
-            }
-            else if (e.PropertyName == "Time")
-            {
-                Symbol.Orders.ForEach(order =>
-                {
-                    if (!order.IsClose)
+                    if (Symbol.Orders.Count > 0) Symbol.Orders.ForEach(order =>
                     {
-                        if(order.OpenTime < Symbol.Time.AddMinutes(-1))
+                        if (!order.IsClose)
                         {
                             order.IsClose = true;
                             order.ClosePrice = Symbol.Price;
                             order.CloseTime = Symbol.Time;
-                            if(order.PositionSide == "Short") order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
+                            if (order.PositionSide == "Short") order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
                             else order.Profit = (order.ClosePrice - order.OpenPrice) / order.OpenPrice;
-                            WriteLog($"Profit all - {Symbol.Orders.Sum(order=> order.Profit)} - {JsonConvert.SerializeObject(order)}");
-                            Symbol.IsOpenOrder = false;
                         }
-                    }
-                });
+                    });
+                }
             }
+            //else if (e.PropertyName == "Delta")
+            //{
+            //    if (!Symbol.IsOpenOrder && Symbol.Delta > Symbol.MaxDelta)
+            //    {
+            //        Symbol.IsOpenOrder = true;
+            //        Models.Order order = new Models.Order();
+            //        order.OpenPrice = Symbol.Price;
+            //        order.OpenTime = Symbol.Time;
+            //        order.IsClose = false;
+            //        order.Delta = Symbol.MaxDelta;
+            //        if (Symbol.Price < Symbol.AveragePrice) order.PositionSide = "Short";
+            //        else order.PositionSide = "Long";
+            //        Symbol.Orders.Add(order);
+            //        Symbol.MaxDelta += 1m;
+            //    }
+            //}
+            //else if (e.PropertyName == "Time")
+            //{
+            //    Symbol.Orders.ForEach(order =>
+            //    {
+            //        if (!order.IsClose)
+            //        {
+            //            if(order.OpenTime < Symbol.Time.AddMinutes(-1))
+            //            {
+            //                order.IsClose = true;
+            //                order.ClosePrice = Symbol.Price;
+            //                order.CloseTime = Symbol.Time;
+            //                if(order.PositionSide == "Short") order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
+            //                else order.Profit = (order.ClosePrice - order.OpenPrice) / order.OpenPrice;
+            //                //WriteLog($"Profit all - {Symbol.Orders.Sum(order=> order.Profit)} - {JsonConvert.SerializeObject(order)}");
+            //                //Symbol.IsOpenOrder = false;
+            //            }
+            //        }
+            //    });
+            //}
         }
         private async void SubscribeToAggregatedTradeUpdatesAsync()
         {
@@ -90,7 +127,33 @@ namespace Project_02.ViewModels
                     Symbol.Price = Message.Data.Price;
                     Symbol.Time = Message.Data.TradeTime;
                     Symbol.AddPrice(new Price() { Value = Message.Data.Price, Time = Message.Data.TradeTime });
-                    
+
+                    if (Symbol.Orders.Count > 0) Symbol.Orders.ForEach(order =>
+                    {
+                        if (!order.IsClose)
+                        {
+                            if (order.PositionSide == "Short")
+                            {
+                                if (Symbol.Price < order.Price)
+                                {
+                                    order.IsClose = true;
+                                    order.ClosePrice = Symbol.Price;
+                                    order.CloseTime = Symbol.Time;
+                                    order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
+                                }
+                            }
+                            else
+                            {
+                                if (Symbol.Price > order.Price)
+                                {
+                                    order.IsClose = true;
+                                    order.ClosePrice = Symbol.Price;
+                                    order.CloseTime = Symbol.Time;
+                                    order.Profit = (order.ClosePrice - order.OpenPrice) / order.OpenPrice;
+                                }
+                            }
+                        }
+                    });
                     //if (Symbol.Run)
                     //{
                     //    // My algorithm

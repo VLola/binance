@@ -96,6 +96,10 @@
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Symbol" Style="{StaticResource styleTextBlockMain}"/>
                 <TextBlock Grid.Column="1" Text="Fifteen Minutes" Style="{StaticResource styleTextBlockMain}"/>
@@ -103,7 +107,11 @@
                 <TextBlock Grid.Column="3" Text="Four Hour" Style="{StaticResource styleTextBlockMain}"/>
                 <TextBlock Grid.Column="4" Text="Eight Hour" Style="{StaticResource styleTextBlockMain}"/>
                 <TextBlock Grid.Column="5" Text="Twelve Hour" Style="{StaticResource styleTextBlockMain}"/>
-                <Button Grid.Column="6" Content="Show info" Command="{Binding Path=CalculateCommand}"/>
+                <TextBlock Grid.Column="6" Text="Long" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="7" Text="Short" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="8" Text="Position" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="9" Text="Take profit" Style="{StaticResource styleTextBlockMain}"/>
+                <Button Grid.Column="10" Content="Show info" Command="{Binding Path=CalculateCommand}"/>
             </Grid>
             <ListBox Grid.Row="1" ItemsSource="{Binding Path=MainModel.Symbols}">
                 <ListBox.ItemTemplate>

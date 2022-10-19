@@ -24,6 +24,11 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Column="0" Text="{Binding Path=Symbol.Name}"/>
         <TextBlock Grid.Column="1" Text="{Binding Path=Symbol.AverageFifteenMinutes}"/>
@@ -31,5 +36,10 @@
         <TextBlock Grid.Column="3" Text="{Binding Path=Symbol.AverageFourHour}"/>
         <TextBlock Grid.Column="4" Text="{Binding Path=Symbol.AverageEightHour}"/>
         <TextBlock Grid.Column="5" Text="{Binding Path=Symbol.AverageTwelveHour}"/>
+        <TextBlock Grid.Column="6" Text="{Binding Path=Symbol.IsLongTP}"/>
+        <TextBlock Grid.Column="7" Text="{Binding Path=Symbol.IsShortTP}"/>
+        <TextBlock Grid.Column="8" Text="{Binding Path=Symbol.Position}"/>
+        <TextBox Grid.Column="9" Text="{Binding Path=Symbol.TakeProfit}"/>
+        <Button Grid.Column="10" Content="Info" Command="{Binding Path=CalculateCommand}"/>
     </Grid>
 </UserControl>

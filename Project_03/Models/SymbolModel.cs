@@ -94,5 +94,46 @@ namespace Project_03.Models
                 OnPropertyChanged("AverageOneDay");
             }
         }
+
+        private bool _isLongTP { get; set; }
+        public bool IsLongTP
+        {
+            get { return _isLongTP; }
+            set
+            {
+                _isLongTP = value;
+                OnPropertyChanged("IsLongTP");
+            }
+        }
+        private bool _isShortTP { get; set; }
+        public bool IsShortTP
+        {
+            get { return _isShortTP; }
+            set
+            {
+                _isShortTP = value;
+                OnPropertyChanged("IsShortTP");
+            }
+        }
+        private decimal _takeProfit { get; set; } = 0.01m;
+        public decimal TakeProfit
+        {
+            get { return _takeProfit; }
+            set
+            {
+                _takeProfit = value;
+                OnPropertyChanged("TakeProfit");
+            }
+        }
+        private string _position { get; set; }
+        public string Position
+        {
+            get { return _position; }
+            set
+            {
+                _position = value;
+                OnPropertyChanged("Position");
+            }
+        }
     }
 }

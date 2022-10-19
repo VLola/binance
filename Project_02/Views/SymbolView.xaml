@@ -30,6 +30,6 @@
         <TextBlock Grid.Column="2" Style="{StaticResource styleStatus}"/>
         <TextBlock Grid.Column="3" Text="{Binding Path=Symbol.Price}"/>
         <TextBlock Grid.Column="4" Text="{Binding Path=Symbol.Delta}"/>
-        <TextBlock Grid.Column="5" Text="{Binding Path=Symbol.MaxDelta}"/>
+        <TextBlock Grid.Column="5" Text="{Binding Path=Symbol.AverageOrderProfit}"/>
     </Grid>
 </UserControl>

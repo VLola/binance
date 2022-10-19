@@ -78,6 +78,8 @@ namespace Project_02.ViewModels
                             order.CloseTime = Symbol.Time;
                             if (order.PositionSide == "Short") order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
                             else order.Profit = (order.ClosePrice - order.OpenPrice) / order.OpenPrice;
+                            Symbol.OrderCount += 1;
+                            Symbol.AverageOrderProfit = Symbol.Orders.Sum(order => order.Profit) / Symbol.OrderCount;
                         }
                     });
                 }
@@ -140,6 +142,8 @@ namespace Project_02.ViewModels
                                     order.ClosePrice = Symbol.Price;
                                     order.CloseTime = Symbol.Time;
                                     order.Profit = (order.OpenPrice - order.ClosePrice) / order.ClosePrice;
+                                    Symbol.OrderCount += 1;
+                                    Symbol.AverageOrderProfit = Symbol.Orders.Sum(order => order.Profit) / Symbol.OrderCount;
                                 }
                             }
                             else
@@ -150,6 +154,8 @@ namespace Project_02.ViewModels
                                     order.ClosePrice = Symbol.Price;
                                     order.CloseTime = Symbol.Time;
                                     order.Profit = (order.ClosePrice - order.OpenPrice) / order.OpenPrice;
+                                    Symbol.OrderCount += 1;
+                                    Symbol.AverageOrderProfit = Symbol.Orders.Sum(order => order.Profit) / Symbol.OrderCount;
                                 }
                             }
                         }

@@ -109,6 +109,26 @@ namespace Project_02.Models
                 OnPropertyChanged("AveragePrice");
             }
         }
+        private decimal _averageOrderProfit { get; set; }
+        public decimal AverageOrderProfit
+        {
+            get { return _averageOrderProfit; }
+            set
+            {
+                _averageOrderProfit = value;
+                OnPropertyChanged("AverageOrderProfit");
+            }
+        }
+        private int _orderCount { get; set; } = 0;
+        public int OrderCount
+        {
+            get { return _orderCount; }
+            set
+            {
+                _orderCount = value;
+                OnPropertyChanged("OrderCount");
+            }
+        }
         private bool _isOpenOrder { get; set; }
         public bool IsOpenOrder
         {

@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Project_03.Views.SymbolView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Project_03.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Red"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Symbol.IsPositive}" Value="True">
+                    <Setter Property="Foreground" Value="Green"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Text="{Binding Path=Symbol.Name}"/>
+        <TextBlock Grid.Column="1" Text="{Binding Path=Symbol.AverageFifteenMinutes}"/>
+        <TextBlock Grid.Column="2" Text="{Binding Path=Symbol.AverageOneHour}"/>
+        <TextBlock Grid.Column="3" Text="{Binding Path=Symbol.AverageFourHour}"/>
+        <TextBlock Grid.Column="4" Text="{Binding Path=Symbol.AverageEightHour}"/>
+        <TextBlock Grid.Column="5" Text="{Binding Path=Symbol.AverageTwelveHour}"/>
+    </Grid>
+</UserControl>

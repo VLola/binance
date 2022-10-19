@@ -3,16 +3,19 @@ using Binance.Net.Objects;
 using Binance.Net.Objects.Models.Spot;
 using CryptoExchange.Net.Authentication;
 using Newtonsoft.Json;
-using Project_02.Command;
-using Project_02.Models;
+using Project_03.Command;
+using Project_03.Models;
+using Project_03.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 
-namespace Project_02.ViewModels
+namespace Project_03.ViewModels
 {
     internal class MainViewModel
     {
@@ -36,9 +39,15 @@ namespace Project_02.ViewModels
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
             MainModel.PropertyChanged += MainModel_PropertyChanged;
         }
-        private void Calculate()
+        private async void Calculate()
         {
-            
+            await Task.Run(() =>
+            {
+                foreach (var item in MainModel.Symbols)
+                {
+                    item.ShowInfo();
+                }
+            });
         }
         private void LoginClient()
         {
@@ -131,13 +140,7 @@ namespace Project_02.ViewModels
 
         private void MainModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "SelectAll")
-            {
-                foreach (var item in MainModel.Symbols)
-                {
-                    item.Symbol.Select = MainModel.SelectAll;
-                }
-            }
+            
         }
         #region - List Sumbols -
         private void GetSumbolName()
@@ -178,6 +181,5 @@ namespace Project_02.ViewModels
             }
             catch { }
         }
-
     }
 }

@@ -3,9 +3,9 @@ using Binance.Net.Objects;
 using Binance.Net.Objects.Models.Spot;
 using CryptoExchange.Net.Authentication;
 using Newtonsoft.Json;
-using Project_03.Command;
-using Project_03.Models;
-using Project_03.Views;
+using Project_04.Command;
+using Project_04.Models;
+using Project_04.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,11 +16,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace Project_03.ViewModels
+namespace Project_04.ViewModels
 {
     internal class MainViewModel
     {
-        DispatcherTimer timer = new();
         private string _link = "https://drive.google.com/u/0/uc?id=13RLR9SIMLL2ibwDh8ouByOElk6Yw784J&export=download";
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         public MainModel MainModel { get; set; } = new();
@@ -38,15 +37,8 @@ namespace Project_03.ViewModels
         }
         public MainViewModel()
         {
-            timer.Interval = TimeSpan.FromMinutes(10);
-            timer.Tick += Timer_Tick;
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
             MainModel.PropertyChanged += MainModel_PropertyChanged;
-        }
-
-        private void Timer_Tick(object? sender, EventArgs e)
-        {
-            Calculate();
         }
 
         private async void Calculate()
@@ -56,24 +48,6 @@ namespace Project_03.ViewModels
                 foreach (var item in MainModel.Symbols)
                 {
                     item.ShowInfo();
-                }
-                int count = 0; 
-                foreach (var item in MainModel.Symbols)
-                {
-                    if(item.Symbol.IsPositive)
-                    {
-                        count++;
-                    }
-                }
-                if(count < 15)
-                {
-                    foreach (var item in MainModel.Symbols)
-                    {
-                        if (item.Symbol.IsPositive)
-                        {
-                            item.WriteHistory();
-                        }
-                    }
                 }
             });
         }
@@ -138,7 +112,6 @@ namespace Project_03.ViewModels
                 {
                     MainModel.IsLogin = true;
                     GetSumbolName();
-                    timer.Start();
                 }
                 else MessageBox.Show("Login failed!");
             }

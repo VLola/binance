@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="Project_04.Views.MainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Project_04.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary Source="/Styles/MainStyle.xaml"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid Style="{StaticResource styleGridLogin}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Style="{StaticResource styleTextBlockLogin}"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=MainModel.Name}" Style="{StaticResource styleTextBoxLogin}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Api key:" Style="{StaticResource styleTextBlockLogin}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=MainModel.ApiKey}" Style="{StaticResource styleTextBoxLogin}"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Secret key:" Style="{StaticResource styleTextBlockLogin}"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=MainModel.SecretKey}" Style="{StaticResource styleTextBoxLogin}"/>
+            <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Real" IsChecked="{Binding Path=MainModel.IsReal}" Style="{StaticResource styleCheckBoxLogin}"/>
+            <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Login" Command="{Binding Path=LoginCommand}" Style="{StaticResource styleButtonLogin}"/>
+        </Grid>
+        <Grid Style="{StaticResource styleGridMain}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderThickness="1" BorderBrush="Black"/>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Symbol" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="1" Text="Fifteen Minutes" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="2" Text="One Hour" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="3" Text="Four Hour" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="4" Text="Eight Hour" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="5" Text="Twelve Hour" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="6" Text="Long" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="7" Text="Short" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="8" Text="Position" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="9" Text="Take profit" Style="{StaticResource styleTextBlockMain}"/>
+                <Button Grid.Column="10" Content="Show info" Command="{Binding Path=CalculateCommand}"/>
+            </Grid>
+            <ListBox Grid.Row="1" ItemsSource="{Binding Path=MainModel.Symbols}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:SymbolView/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Grid>
+</UserControl>

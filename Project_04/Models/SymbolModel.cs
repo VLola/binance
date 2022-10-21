@@ -115,7 +115,7 @@ namespace Project_04.Models
                 OnPropertyChanged("IsShortTP");
             }
         }
-        private decimal _takeProfit { get; set; } = 0.01m;
+        private decimal _takeProfit { get; set; } = 0.05m;
         public decimal TakeProfit
         {
             get { return _takeProfit; }
@@ -123,6 +123,16 @@ namespace Project_04.Models
             {
                 _takeProfit = value;
                 OnPropertyChanged("TakeProfit");
+            }
+        }
+        private decimal _stopLoss { get; set; } = 0.05m;
+        public decimal StopLoss
+        {
+            get { return _stopLoss; }
+            set
+            {
+                _stopLoss = value;
+                OnPropertyChanged("StopLoss");
             }
         }
         private string _position { get; set; }
@@ -133,6 +143,78 @@ namespace Project_04.Models
             {
                 _position = value;
                 OnPropertyChanged("Position");
+            }
+        }
+        private int _betPlus { get; set; } = 0;
+        public int BetPlus
+        {
+            get { return _betPlus; }
+            set
+            {
+                _betPlus = value;
+                OnPropertyChanged("BetPlus");
+                if (_betMinus > 0) PercentWin = (double)_betPlus / (double)_betMinus;
+            }
+        }
+        private int _betMinus { get; set; } = 0;
+        public int BetMinus
+        {
+            get { return _betMinus; }
+            set
+            {
+                _betMinus = value;
+                OnPropertyChanged("BetMinus");
+                if(_betMinus > 0) PercentWin = (double)_betPlus / (double)_betMinus;
+            }
+        }
+        private int _betIndefinite { get; set; } = 0;
+        public int BetIndefinite
+        {
+            get { return _betIndefinite; }
+            set
+            {
+                _betIndefinite = value;
+                OnPropertyChanged("BetIndefinite");
+            }
+        }
+        private bool _isSelect { get; set; }
+        public bool IsSelect
+        {
+            get { return _isSelect; }
+            set
+            {
+                _isSelect = value;
+                OnPropertyChanged("IsSelect");
+            }
+        }
+        private double _percentWin { get; set; }
+        public double PercentWin
+        {
+            get { return _percentWin; }
+            set
+            {
+                _percentWin = value;
+                OnPropertyChanged("PercentWin");
+            }
+        }
+        private DateTime _startTime { get; set; } = new DateTime(2022, 9, 20, 0, 0, 0);
+        public DateTime StartTime
+        {
+            get { return _startTime; }
+            set
+            {
+                _startTime = value;
+                OnPropertyChanged("StartTime");
+            }
+        }
+        private DateTime _endTime { get; set; } = new DateTime(2022, 10, 20, 0, 0, 0);
+        public DateTime EndTime
+        {
+            get { return _endTime; }
+            set
+            {
+                _endTime = value;
+                OnPropertyChanged("EndTime");
             }
         }
     }

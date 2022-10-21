@@ -69,5 +69,55 @@ namespace Project_04.Models
                 OnPropertyChanged("SecretKey");
             }
         }
+        private decimal _takeProfit { get; set; } = 0.05m;
+        public decimal TakeProfit
+        {
+            get { return _takeProfit; }
+            set
+            {
+                _takeProfit = value;
+                OnPropertyChanged("TakeProfit");
+            }
+        }
+        private decimal _stopLoss { get; set; } = 0.05m;
+        public decimal StopLoss
+        {
+            get { return _stopLoss; }
+            set
+            {
+                _stopLoss = value;
+                OnPropertyChanged("StopLoss");
+            }
+        }
+        private bool _isSelect { get; set; }
+        public bool IsSelect
+        {
+            get { return _isSelect; }
+            set
+            {
+                _isSelect = value;
+                OnPropertyChanged("IsSelect");
+            }
+        }
+        private DateTime _startTime { get; set; } = new DateTime(2022, 9, 20, 0, 0, 0);
+        public DateTime StartTime
+        {
+            get { return _startTime; }
+            set
+            {
+                _startTime = value;
+                OnPropertyChanged("StartTime");
+            }
+        }
+        private DateTime _endTime { get; set; } = new DateTime(2022, 10, 20, 0, 0, 0);
+        public DateTime EndTime
+        {
+            get { return _endTime; }
+            set
+            {
+                _endTime = value;
+                OnPropertyChanged("EndTime");
+            }
+        }
     }
 }

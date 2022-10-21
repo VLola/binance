@@ -34,36 +34,56 @@
         <Grid Style="{StaticResource styleGridMain}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Border Grid.Row="0" BorderThickness="1" BorderBrush="Black"/>
+            <Border Grid.Row="1" BorderThickness="1" BorderBrush="Black"/>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" Content="Select all" IsChecked="{Binding Path=MainModel.IsSelect}" Style="{StaticResource styleCheckBoxMain}"/>
+                <TextBlock Grid.Column="1" Text="Take profit:" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBox Grid.Column="2" Text="{Binding Path=MainModel.TakeProfit}" Style="{StaticResource styleTextBoxMain}"/>
+                <TextBlock Grid.Column="3" Text="Stop loss:" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBox Grid.Column="4" Text="{Binding Path=MainModel.StopLoss}" Style="{StaticResource styleTextBoxMain}"/>
+                <TextBlock Grid.Column="5" Text="Start:" Style="{StaticResource styleTextBlockMain}"/>
+                <DatePicker Grid.Column="6" SelectedDate="{Binding Path=MainModel.StartTime}" Style="{StaticResource styleDatePickerMain}"/>
+                <TextBlock Grid.Column="7" Text="End:" Style="{StaticResource styleTextBlockMain}"/>
+                <DatePicker Grid.Column="8" SelectedDate="{Binding Path=MainModel.EndTime}" Style="{StaticResource styleDatePickerMain}"/>
+                <Button Grid.Column="9" Content="All info" Command="{Binding Path=CalculateCommand}" Style="{StaticResource styleButtonMain}"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Symbol" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="1" Text="Fifteen Minutes" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="2" Text="One Hour" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="3" Text="Four Hour" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="4" Text="Eight Hour" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="5" Text="Twelve Hour" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="6" Text="Long" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="7" Text="Short" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="8" Text="Position" Style="{StaticResource styleTextBlockMain}"/>
-                <TextBlock Grid.Column="9" Text="Take profit" Style="{StaticResource styleTextBlockMain}"/>
-                <Button Grid.Column="10" Content="Show info" Command="{Binding Path=CalculateCommand}"/>
+                <TextBlock Grid.Column="0" Text="Select" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="1" Text="Symbol" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="2" Text="Plus" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="3" Text="Minus" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="4" Text="Indefinite" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="5" Text="Win %" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="6" Text="Take profit" Style="{StaticResource styleTextBlockMain}"/>
+                <TextBlock Grid.Column="7" Text="Stop loss" Style="{StaticResource styleTextBlockMain}"/>
             </Grid>
-            <ListBox Grid.Row="1" ItemsSource="{Binding Path=MainModel.Symbols}">
+            <ListBox Grid.Row="2" ItemsSource="{Binding Path=MainModel.Symbols}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <local:SymbolView/>

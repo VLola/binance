@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Project_04.ViewModels
 {
@@ -26,6 +27,7 @@ namespace Project_04.ViewModels
         private BinanceSocketClient _socketClient { get; set; }
         private BinanceClient _client { get; set; }
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
+        private string _pathHistory = $"{Directory.GetCurrentDirectory()}/history/";
         private RelayCommand? _calculateCommand;
         public RelayCommand CalculateCommand
         {
@@ -41,18 +43,28 @@ namespace Project_04.ViewModels
 
         DateTime dateTime = DateTime.Now;
         BetModel betModel = new();
-        List<IBinanceKline> binanceKlines = new();
+        List<BinanceSpotKline> binanceKlines = new();
         public void ShowInfo()
         {
-            Reload();
-
-            for (int i = 0; i < 10; i++) {
-                binanceKlines.InsertRange(0, Klines(KlineInterval.OneMinute, 480, endTime: dateTime));
-                dateTime = dateTime.AddMinutes(-480);
-            }
-            while (binanceKlines.Count > 2880)
+            if (Symbol.IsSelect)
             {
-                OpenOrder();
+                ReloadSymbol();
+
+                //for (int i = 0; i < 90; i++) {
+                //    binanceKlines.InsertRange(0, Klines(KlineInterval.OneMinute, 480, endTime: dateTime));
+                //    dateTime = dateTime.AddMinutes(-480);
+                //}
+                binanceKlines.Clear();
+                string json = File.ReadAllText(_pathHistory + Symbol.Name);
+                foreach (var kline in JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json))
+                {
+                    if (kline.OpenTime > Symbol.StartTime && kline.OpenTime < Symbol.EndTime) binanceKlines.Add(kline);
+                }
+                while (binanceKlines.Count > 2880)
+                {
+                    ReloadBet();
+                    OpenOrder();
+                }
             }
         }
         private void OpenOrder()
@@ -172,61 +184,99 @@ namespace Project_04.ViewModels
             {
                 if (count > 1440)
                 {
-                    if ((openPrice - (openPrice * Symbol.TakeProfit)) > item.LowPrice && (openPrice + (openPrice * Symbol.TakeProfit)) < item.HighPrice)
+                    if (Symbol.Position == "Long")
                     {
-                        checkCloseOrder = true;
-                        Symbol.IsShortTP = true;
-                        Symbol.IsLongTP = true;
-                        betModel.Status = "Indefinite";
-                        betModel.OpenPrice = $"{openPrice}";
-                        betModel.OpenTime = $"{openTime}";
-                        betModel.ClosePrice = "NoPrice";
-                        betModel.CloseTime = $"{item.OpenTime}";
-                        timeSpan = item.OpenTime.Subtract(openTime);
-                        WriteHistory();
-                        break;
-                    }
-                    else if ((openPrice - (openPrice * Symbol.TakeProfit)) > item.LowPrice)
-                    {
-                        checkCloseOrder = true;
-                        Symbol.IsShortTP = true;
-                        betModel.OpenPrice = $"{openPrice}";
-                        betModel.OpenTime = $"{openTime}";
-                        betModel.ClosePrice = $"{openPrice - (openPrice * Symbol.TakeProfit)}";
-                        betModel.CloseTime = $"{item.OpenTime}";
-                        timeSpan = item.OpenTime.Subtract(openTime);
-                        if (Symbol.Position == "Long")
+                        if ((openPrice - (openPrice * Symbol.StopLoss)) > item.LowPrice && (openPrice + (openPrice * Symbol.TakeProfit)) < item.HighPrice)
                         {
+                            checkCloseOrder = true;
+                            Symbol.IsShortTP = true;
+                            Symbol.IsLongTP = true;
+                            betModel.Status = "Indefinite";
+                            betModel.OpenPrice = $"{openPrice}";
+                            betModel.OpenTime = $"{openTime}";
+                            betModel.ClosePrice = "NoPrice";
+                            betModel.CloseTime = $"{item.OpenTime}";
+                            timeSpan = item.OpenTime.Subtract(openTime);
+                            WriteHistory();
+                            Symbol.BetIndefinite += 1;
+                            break;
+                        }
+                        else if ((openPrice - (openPrice * Symbol.StopLoss)) > item.LowPrice)
+                        {
+                            checkCloseOrder = true;
+                            Symbol.IsShortTP = true;
+                            betModel.OpenPrice = $"{openPrice}";
+                            betModel.OpenTime = $"{openTime}";
+                            betModel.ClosePrice = $"{openPrice - (openPrice * Symbol.TakeProfit)}";
+                            betModel.CloseTime = $"{item.OpenTime}";
+                            timeSpan = item.OpenTime.Subtract(openTime);
                             betModel.Status = "Lose";
                             WriteHistory();
+                            Symbol.BetMinus += 1;
+                            break;
                         }
-                        else
+                        else if ((openPrice + (openPrice * Symbol.TakeProfit)) < item.HighPrice)
                         {
+                            checkCloseOrder = true;
+                            Symbol.IsLongTP = true;
+                            betModel.OpenPrice = $"{openPrice}";
+                            betModel.OpenTime = $"{openTime}";
+                            betModel.ClosePrice = $"{openPrice + (openPrice * Symbol.TakeProfit)}";
+                            betModel.CloseTime = $"{item.OpenTime}";
+                            timeSpan = item.OpenTime.Subtract(openTime);
                             betModel.Status = "Win";
                             WriteHistory();
+                            Symbol.BetPlus += 1;
+                            break;
                         }
-                        break;
                     }
-                    else if ((openPrice + (openPrice * Symbol.TakeProfit)) < item.HighPrice)
+                    else if (Symbol.Position == "Short")
                     {
-                        checkCloseOrder = true;
-                        Symbol.IsLongTP = true;
-                        betModel.OpenPrice = $"{openPrice}";
-                        betModel.OpenTime = $"{openTime}";
-                        betModel.ClosePrice = $"{openPrice + (openPrice * Symbol.TakeProfit)}";
-                        betModel.CloseTime = $"{item.OpenTime}";
-                        timeSpan = item.OpenTime.Subtract(openTime);
-                        if (Symbol.Position == "Long")
+                        if ((openPrice - (openPrice * Symbol.TakeProfit)) > item.LowPrice && (openPrice + (openPrice * Symbol.StopLoss)) < item.HighPrice)
                         {
+                            checkCloseOrder = true;
+                            Symbol.IsShortTP = true;
+                            Symbol.IsLongTP = true;
+                            betModel.Status = "Indefinite";
+                            betModel.OpenPrice = $"{openPrice}";
+                            betModel.OpenTime = $"{openTime}";
+                            betModel.ClosePrice = "NoPrice";
+                            betModel.CloseTime = $"{item.OpenTime}";
+                            timeSpan = item.OpenTime.Subtract(openTime);
+                            WriteHistory();
+                            Symbol.BetIndefinite += 1;
+                            break;
+                        }
+                        else if ((openPrice - (openPrice * Symbol.TakeProfit)) > item.LowPrice)
+                        {
+                            checkCloseOrder = true;
+                            Symbol.IsShortTP = true;
+                            betModel.OpenPrice = $"{openPrice}";
+                            betModel.OpenTime = $"{openTime}";
+                            betModel.ClosePrice = $"{openPrice - (openPrice * Symbol.TakeProfit)}";
+                            betModel.CloseTime = $"{item.OpenTime}";
+                            timeSpan = item.OpenTime.Subtract(openTime);
+
                             betModel.Status = "Win";
                             WriteHistory();
+                            Symbol.BetPlus += 1;
+                            break;
                         }
-                        else
+                        else if ((openPrice + (openPrice * Symbol.StopLoss)) < item.HighPrice)
                         {
+                            checkCloseOrder = true;
+                            Symbol.IsLongTP = true;
+                            betModel.OpenPrice = $"{openPrice}";
+                            betModel.OpenTime = $"{openTime}";
+                            betModel.ClosePrice = $"{openPrice + (openPrice * Symbol.TakeProfit)}";
+                            betModel.CloseTime = $"{item.OpenTime}";
+                            timeSpan = item.OpenTime.Subtract(openTime);
+
                             betModel.Status = "Lose";
                             WriteHistory();
+                            Symbol.BetMinus += 1;
+                            break;
                         }
-                        break;
                     }
                 }
                 count++;
@@ -239,6 +289,7 @@ namespace Project_04.ViewModels
                 betModel.ClosePrice = "NoPrice";
                 betModel.CloseTime = "NoTime";
                 WriteHistory();
+                Symbol.BetIndefinite += 1;
             }
             return timeSpan;
         }
@@ -263,7 +314,7 @@ namespace Project_04.ViewModels
             }
             return null;
         }
-        private void Reload()
+        private void ReloadBet()
         {
             Symbol.IsOpenOrder = false;
             Symbol.IsLongTP = false;
@@ -274,6 +325,12 @@ namespace Project_04.ViewModels
             betModel.OpenTime = "";
             betModel.ClosePrice = "";
             betModel.CloseTime = "";
+        }
+        private void ReloadSymbol()
+        {
+            Symbol.BetPlus = 0;
+            Symbol.BetMinus = 0;
+            Symbol.BetIndefinite = 0;
         }
 
         private void WriteLog(string text)

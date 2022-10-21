@@ -2,6 +2,7 @@
 using Binance.Net.Objects;
 using Binance.Net.Objects.Models.Spot;
 using CryptoExchange.Net.Authentication;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Project_04.Command;
 using Project_04.Models;
@@ -20,8 +21,8 @@ namespace Project_04.ViewModels
 {
     internal class MainViewModel
     {
-        private string _link = "https://drive.google.com/u/0/uc?id=13RLR9SIMLL2ibwDh8ouByOElk6Yw784J&export=download";
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
+        private string _pathHistory = $"{Directory.GetCurrentDirectory()}/history/";
         public MainModel MainModel { get; set; } = new();
         private BinanceClient? _client { get; set; }
         private BinanceSocketClient? _socketClient { get; set; }
@@ -38,7 +39,12 @@ namespace Project_04.ViewModels
         public MainViewModel()
         {
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
+            if (!Directory.Exists(_pathHistory)) Directory.CreateDirectory(_pathHistory);
             MainModel.PropertyChanged += MainModel_PropertyChanged;
+            // Delete
+            _client = new();
+            MainModel.IsLogin = true;
+            GetSumbolName();
         }
 
         private async void Calculate()
@@ -47,7 +53,9 @@ namespace Project_04.ViewModels
             {
                 foreach (var item in MainModel.Symbols)
                 {
-                    item.ShowInfo();
+                    Task.Run(() => {
+                        item.ShowInfo();
+                    });
                 }
             });
         }
@@ -55,7 +63,12 @@ namespace Project_04.ViewModels
         {
             using (var client = new WebClient())
             {
-                string json = client.DownloadString(_link);
+                new ConfigurationBuilder().AddUserSecrets<MainViewModel>()
+                 .Build()
+                 .Providers
+                 .First()
+                 .TryGet("linkStr", out var linkStr);
+                string json = client.DownloadString(linkStr);
                 List<ClientModel>? clientModels = JsonConvert.DeserializeObject<List<ClientModel>>(json);
                 if (clientModels != null)
                 {
@@ -142,7 +155,47 @@ namespace Project_04.ViewModels
 
         private void MainModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            
+            if(e.PropertyName == "TakeProfit")
+            {
+                if(MainModel.TakeProfit > 0m)
+                {
+                    foreach (var item in MainModel.Symbols)
+                    {
+                        item.Symbol.TakeProfit = MainModel.TakeProfit;
+                    }
+                }
+            }
+            else if (e.PropertyName == "StopLoss")
+            {
+                if (MainModel.TakeProfit > 0m)
+                {
+                    foreach (var item in MainModel.Symbols)
+                    {
+                        item.Symbol.StopLoss = MainModel.StopLoss;
+                    }
+                }
+            }
+            else if (e.PropertyName == "IsSelect")
+            {
+                foreach (var item in MainModel.Symbols)
+                {
+                    item.Symbol.IsSelect = MainModel.IsSelect;
+                }
+            }
+            else if (e.PropertyName == "StartTime")
+            {
+                foreach (var item in MainModel.Symbols)
+                {
+                    item.Symbol.StartTime = MainModel.StartTime;
+                }
+            }
+            else if (e.PropertyName == "EndTime")
+            {
+                foreach (var item in MainModel.Symbols)
+                {
+                    item.Symbol.EndTime = MainModel.EndTime;
+                }
+            }
         }
         #region - List Sumbols -
         private void GetSumbolName()

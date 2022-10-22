@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Binance.Net" Version="8.1.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="ScottPlot.WPF" Version="4.1.58" />
   </ItemGroup>
 
 </Project>

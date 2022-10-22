@@ -8,6 +8,7 @@ using CryptoExchange.Net.Sockets;
 using Newtonsoft.Json;
 using Project_04.Command;
 using Project_04.Models;
+using Project_04.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,10 @@ namespace Project_04.ViewModels
 {
     internal class SymbolViewModel
     {
+
+        BetModel betModel = new();
+        List<BinanceSpotKline> binanceKlines = new();
+        int _minutes = 2880;
         public SymbolModel Symbol { get; set; }
         private BinanceSocketClient _socketClient { get; set; }
         private BinanceClient _client { get; set; }
@@ -32,7 +37,12 @@ namespace Project_04.ViewModels
         private RelayCommand? _calculateCommand;
         public RelayCommand CalculateCommand
         {
-            get { return _calculateCommand ?? (_calculateCommand = new RelayCommand(obj => { ShowInfo(); })); }
+            get { return _calculateCommand ?? (_calculateCommand = new RelayCommand(obj => { Calculate(); })); }
+        }
+        private RelayCommand? _showChartCommand;
+        public RelayCommand ShowChartCommand
+        {
+            get { return _showChartCommand ?? (_showChartCommand = new RelayCommand(obj => { ShowChart(); })); }
         }
         public SymbolViewModel(BinanceClient client, BinanceSocketClient socketClient, string symbolName)
         {
@@ -41,11 +51,12 @@ namespace Project_04.ViewModels
             _socketClient = socketClient;
             Symbol.Name = symbolName;
         }
-
-        BetModel betModel = new();
-        List<BinanceSpotKline> binanceKlines = new();
-        int _minutes = 2880;
-        public void ShowInfo()
+        private void ShowChart()
+        {
+            ChartView chartView = new(Symbol.Name);
+            chartView.ShowDialog();
+        }
+        public void Calculate()
         {
             if (Symbol.IsSelect)
             {

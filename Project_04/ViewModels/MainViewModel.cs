@@ -56,7 +56,7 @@ namespace Project_04.ViewModels
                 foreach (var item in MainModel.Symbols)
                 {
                     Task.Run(() => {
-                        item.ShowInfo();
+                        item.Calculate();
                     });
                 }
             });

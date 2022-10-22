@@ -28,6 +28,7 @@ namespace Project_04.ViewModels
         private BinanceClient _client { get; set; }
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         private string _pathHistory = $"{Directory.GetCurrentDirectory()}/history/";
+        private string _pathStatistics = $"{Directory.GetCurrentDirectory()}/statistics/";
         private RelayCommand? _calculateCommand;
         public RelayCommand CalculateCommand
         {
@@ -41,13 +42,38 @@ namespace Project_04.ViewModels
             Symbol.Name = symbolName;
         }
 
-        DateTime dateTime = DateTime.Now;
         BetModel betModel = new();
         List<BinanceSpotKline> binanceKlines = new();
+        int _minutes = 2880;
         public void ShowInfo()
         {
             if (Symbol.IsSelect)
             {
+                //Symbol.StartTime = new DateTime(2022, 9, 20, 0, 0, 0);
+                //Symbol.EndTime = new DateTime(2022, 9, 22, 0, 0, 0);
+                //for (int i = 0; i < 25; i++)
+                //{
+                //    ReloadSymbol();
+
+                //    //for (int i = 0; i < 90; i++) {
+                //    //    binanceKlines.InsertRange(0, Klines(KlineInterval.OneMinute, 480, endTime: dateTime));
+                //    //    dateTime = dateTime.AddMinutes(-480);
+                //    //}
+                //    binanceKlines.Clear();
+                //    string json = File.ReadAllText(_pathHistory + Symbol.Name);
+                //    foreach (var kline in JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json))
+                //    {
+                //        if (kline.OpenTime > Symbol.StartTime && kline.OpenTime < Symbol.EndTime) binanceKlines.Add(kline);
+                //    }
+                //    while (binanceKlines.Count > 1440)
+                //    {
+                //        ReloadBet();
+                //        OpenOrder();
+                //    }
+                //    File.AppendAllText(_pathStatistics + Symbol.Name, Symbol.PercentWin.ToString() + "\n");
+                //    Symbol.StartTime += TimeSpan.FromHours(24);
+                //    Symbol.EndTime += TimeSpan.FromHours(24);
+                //}
                 ReloadSymbol();
 
                 //for (int i = 0; i < 90; i++) {
@@ -60,7 +86,7 @@ namespace Project_04.ViewModels
                 {
                     if (kline.OpenTime > Symbol.StartTime && kline.OpenTime < Symbol.EndTime) binanceKlines.Add(kline);
                 }
-                while (binanceKlines.Count > 2880)
+                while (binanceKlines.Count > _minutes)
                 {
                     ReloadBet();
                     OpenOrder();
@@ -76,6 +102,7 @@ namespace Project_04.ViewModels
             decimal eightHourMax = 0m;
             decimal twelveHourMax = 0m;
             decimal oneDayMax = 0m;
+            decimal twoDayMax = 0m;
 
             decimal fifteenMinutesMin = 1000000m;
             decimal oneHourMin = 1000000m;
@@ -83,41 +110,47 @@ namespace Project_04.ViewModels
             decimal eightHourMin = 1000000m;
             decimal twelveHourMin = 1000000m;
             decimal oneDayMin = 1000000m;
+            decimal twoDayMin = 1000000m;
             decimal openPrice = 0m;
             DateTime openTime = DateTime.Now;
             binanceKlines.ForEach(kline =>
             {
-                if (count > 1425 && count < 1440)
+                if (count > (_minutes - 15) && count < _minutes)
                 {
                     if (fifteenMinutesMin > kline.LowPrice) fifteenMinutesMin = kline.LowPrice;
                     if (fifteenMinutesMax < kline.HighPrice) fifteenMinutesMax = kline.HighPrice;
                 }
-                if (count > 1380 && count < 1440)
+                if (count > (_minutes - 60) && count < _minutes)
                 {
                     if (oneHourMin > kline.LowPrice) oneHourMin = kline.LowPrice;
                     if (oneHourMax < kline.HighPrice) oneHourMax = kline.HighPrice;
                 }
-                if (count > 1200 && count < 1440)
+                if (count > (_minutes - 240) && count < _minutes)
                 {
                     if (fourHourMin > kline.LowPrice) fourHourMin = kline.LowPrice;
                     if (fourHourMax < kline.HighPrice) fourHourMax = kline.HighPrice;
                 }
-                if (count > 960 && count < 1440)
+                if (count > (_minutes - 480) && count < _minutes)
                 {
                     if (eightHourMin > kline.LowPrice) eightHourMin = kline.LowPrice;
                     if (eightHourMax < kline.HighPrice) eightHourMax = kline.HighPrice;
                 }
-                if (count > 720 && count < 1440)
+                if (count > (_minutes - 720) && count < _minutes)
                 {
                     if (twelveHourMin > kline.LowPrice) twelveHourMin = kline.LowPrice;
                     if (twelveHourMax < kline.HighPrice) twelveHourMax = kline.HighPrice;
                 }
-                if (count < 1440)
+                if (count < _minutes - 1440)
                 {
                     if (oneDayMin > kline.LowPrice) oneDayMin = kline.LowPrice;
                     if (oneDayMax < kline.HighPrice) oneDayMax = kline.HighPrice;
                 }
-                if (count == 1440)
+                if (count < _minutes)
+                {
+                    if (twoDayMin > kline.LowPrice) twoDayMin = kline.LowPrice;
+                    if (twoDayMax < kline.HighPrice) twoDayMax = kline.HighPrice;
+                }
+                if (count == _minutes)
                 {
                     openPrice = kline.OpenPrice;
                     openTime = kline.OpenTime;
@@ -137,11 +170,14 @@ namespace Project_04.ViewModels
 
             Symbol.AverageOneDay = Math.Round((oneDayMax + oneDayMin) / 2, 9);
 
+            Symbol.AverageTwoDay = Math.Round((twoDayMax + twoDayMin) / 2, 9);
+
             if (Symbol.AverageFifteenMinutes < Symbol.AverageOneHour &&
                 Symbol.AverageOneHour < Symbol.AverageFourHour &&
                 Symbol.AverageFourHour < Symbol.AverageEightHour &&
                 Symbol.AverageEightHour < Symbol.AverageTwelveHour &&
-                Symbol.AverageTwelveHour < Symbol.AverageOneDay)
+                Symbol.AverageTwelveHour < Symbol.AverageOneDay &&
+                Symbol.AverageOneDay < Symbol.AverageTwoDay)
             {
                 Symbol.IsOpenOrder = true;
                 Symbol.Position = "Short";
@@ -150,7 +186,8 @@ namespace Project_04.ViewModels
                 Symbol.AverageOneHour > Symbol.AverageFourHour &&
                 Symbol.AverageFourHour > Symbol.AverageEightHour &&
                 Symbol.AverageEightHour > Symbol.AverageTwelveHour &&
-                Symbol.AverageTwelveHour > Symbol.AverageOneDay)
+                Symbol.AverageTwelveHour > Symbol.AverageOneDay &&
+                Symbol.AverageOneDay > Symbol.AverageTwoDay)
             {
                 Symbol.IsOpenOrder = true;
                 Symbol.Position = "Long";
@@ -182,7 +219,7 @@ namespace Project_04.ViewModels
             int count = 0;
             foreach (var item in binanceKlines)
             {
-                if (count > 1440)
+                if (count > _minutes)
                 {
                     if (Symbol.Position == "Long")
                     {

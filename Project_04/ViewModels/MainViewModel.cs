@@ -23,6 +23,7 @@ namespace Project_04.ViewModels
     {
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         private string _pathHistory = $"{Directory.GetCurrentDirectory()}/history/";
+        private string _pathStatistics = $"{Directory.GetCurrentDirectory()}/statistics/";
         public MainModel MainModel { get; set; } = new();
         private BinanceClient? _client { get; set; }
         private BinanceSocketClient? _socketClient { get; set; }
@@ -40,6 +41,7 @@ namespace Project_04.ViewModels
         {
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
             if (!Directory.Exists(_pathHistory)) Directory.CreateDirectory(_pathHistory);
+            if (!Directory.Exists(_pathStatistics)) Directory.CreateDirectory(_pathStatistics);
             MainModel.PropertyChanged += MainModel_PropertyChanged;
             // Delete
             _client = new();

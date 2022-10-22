@@ -95,6 +95,17 @@ namespace Project_04.Models
             }
         }
 
+        private decimal _averageTwoDay { get; set; }
+        public decimal AverageTwoDay
+        {
+            get { return _averageTwoDay; }
+            set
+            {
+                _averageTwoDay = value;
+                OnPropertyChanged("AverageTwoDay");
+            }
+        }
+
         private bool _isLongTP { get; set; }
         public bool IsLongTP
         {

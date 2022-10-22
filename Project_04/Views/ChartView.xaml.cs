@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Project_04.Models;
+using ScottPlot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,13 +21,18 @@ namespace Project_04.Views
     /// </summary>
     public partial class ChartView : Window
     {
-        public ChartView(string name)
+        public ChartView(string name, ChartModel chartModel)
         {
             InitializeComponent();
-            double[] dataX = new double[] { 1, 2, 3, 4, 5 };
-            double[] dataY = new double[] { 1, 4, 9, 16, 25 };
-            plt.Plot.AddScatter(dataX, dataY);
             this.Title = name;
+            plt.Plot.AddCandlesticks(chartModel.OHLCs.ToArray());
+            foreach (var item in chartModel.Averages)
+            {
+                plt.Plot.AddScatter(item.dataX, item.dataY);
+            }
+            plt.Plot.AddScatter(chartModel.OpenOrders.OpenTimes.ToArray(), chartModel.OpenOrders.OpenPrices.ToArray(), color: System.Drawing.Color.Green, lineWidth: 0, markerSize: 8);
+            plt.Plot.AddScatter(chartModel.CloseOrders.OpenTimes.ToArray(), chartModel.CloseOrders.OpenPrices.ToArray(), color: System.Drawing.Color.DarkRed, lineWidth: 0, markerSize: 8);
+            plt.Refresh();
         }
     }
 }

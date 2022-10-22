@@ -26,6 +26,7 @@ namespace Project_04.ViewModels
     {
 
         BetModel betModel = new();
+        ChartModel chartModel = new();
         List<BinanceSpotKline> binanceKlines = new();
         int _minutes = 2880;
         public SymbolModel Symbol { get; set; }
@@ -53,7 +54,7 @@ namespace Project_04.ViewModels
         }
         private void ShowChart()
         {
-            ChartView chartView = new(Symbol.Name);
+            ChartView chartView = new(Symbol.Name, chartModel);
             chartView.ShowDialog();
         }
         public void Calculate()
@@ -92,10 +93,22 @@ namespace Project_04.ViewModels
                 //    dateTime = dateTime.AddMinutes(-480);
                 //}
                 binanceKlines.Clear();
+                chartModel.OHLCs.Clear();
+                chartModel.Averages.Clear();
                 string json = File.ReadAllText(_pathHistory + Symbol.Name);
                 foreach (var kline in JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json))
                 {
-                    if (kline.OpenTime > Symbol.StartTime && kline.OpenTime < Symbol.EndTime) binanceKlines.Add(kline);
+                    if (kline.OpenTime > Symbol.StartTime && kline.OpenTime < Symbol.EndTime) {
+                        binanceKlines.Add(kline);
+                        chartModel.OHLCs.Add(new ScottPlot.OHLC(
+                            Decimal.ToDouble(kline.OpenPrice),
+                            Decimal.ToDouble(kline.HighPrice),
+                            Decimal.ToDouble(kline.LowPrice),
+                            Decimal.ToDouble(kline.ClosePrice),
+                            kline.OpenTime,
+                            TimeSpan.FromMinutes(1),
+                            Decimal.ToDouble(kline.Volume)));
+                    }
                 }
                 while (binanceKlines.Count > _minutes)
                 {
@@ -165,6 +178,7 @@ namespace Project_04.ViewModels
                 {
                     openPrice = kline.OpenPrice;
                     openTime = kline.OpenTime;
+                    Symbol.OpenTime = kline.OpenTime;
                 }
                 count++;
             });
@@ -192,6 +206,18 @@ namespace Project_04.ViewModels
             {
                 Symbol.IsOpenOrder = true;
                 Symbol.Position = "Short";
+                chartModel.Averages.Add(new AverageModel(
+                        Symbol.OpenTime,
+                        Symbol.AverageFifteenMinutes,
+                        Symbol.AverageOneHour,
+                        Symbol.AverageFourHour,
+                        Symbol.AverageEightHour,
+                        Symbol.AverageTwelveHour,
+                        Symbol.AverageOneDay,
+                        Symbol.AverageTwoDay
+                        ));
+                chartModel.OpenOrders.OpenPrices.Add(Decimal.ToDouble(openPrice));
+                chartModel.OpenOrders.OpenTimes.Add(openTime.ToOADate());
             }
             else if (Symbol.AverageFifteenMinutes > Symbol.AverageOneHour &&
                 Symbol.AverageOneHour > Symbol.AverageFourHour &&
@@ -202,6 +228,18 @@ namespace Project_04.ViewModels
             {
                 Symbol.IsOpenOrder = true;
                 Symbol.Position = "Long";
+                chartModel.Averages.Add(new AverageModel(
+                        Symbol.OpenTime,
+                        Symbol.AverageFifteenMinutes,
+                        Symbol.AverageOneHour,
+                        Symbol.AverageFourHour,
+                        Symbol.AverageEightHour,
+                        Symbol.AverageTwelveHour,
+                        Symbol.AverageOneDay,
+                        Symbol.AverageTwoDay
+                        ));
+                chartModel.OpenOrders.OpenPrices.Add(Decimal.ToDouble(openPrice));
+                chartModel.OpenOrders.OpenTimes.Add(openTime.ToOADate());
             }
             else
             {
@@ -244,6 +282,8 @@ namespace Project_04.ViewModels
                             betModel.OpenTime = $"{openTime}";
                             betModel.ClosePrice = "NoPrice";
                             betModel.CloseTime = $"{item.OpenTime}";
+                            chartModel.CloseOrders.OpenPrices.Add(Decimal.ToDouble(openPrice));
+                            chartModel.CloseOrders.OpenTimes.Add(item.OpenTime.ToOADate());
                             timeSpan = item.OpenTime.Subtract(openTime);
                             WriteHistory();
                             Symbol.BetIndefinite += 1;
@@ -255,8 +295,10 @@ namespace Project_04.ViewModels
                             Symbol.IsShortTP = true;
                             betModel.OpenPrice = $"{openPrice}";
                             betModel.OpenTime = $"{openTime}";
-                            betModel.ClosePrice = $"{openPrice - (openPrice * Symbol.TakeProfit)}";
+                            betModel.ClosePrice = $"{openPrice - (openPrice * Symbol.StopLoss)}";
                             betModel.CloseTime = $"{item.OpenTime}";
+                            chartModel.CloseOrders.OpenPrices.Add(Decimal.ToDouble(openPrice - (openPrice * Symbol.StopLoss)));
+                            chartModel.CloseOrders.OpenTimes.Add(item.OpenTime.ToOADate());
                             timeSpan = item.OpenTime.Subtract(openTime);
                             betModel.Status = "Lose";
                             WriteHistory();
@@ -271,6 +313,8 @@ namespace Project_04.ViewModels
                             betModel.OpenTime = $"{openTime}";
                             betModel.ClosePrice = $"{openPrice + (openPrice * Symbol.TakeProfit)}";
                             betModel.CloseTime = $"{item.OpenTime}";
+                            chartModel.CloseOrders.OpenPrices.Add(Decimal.ToDouble(openPrice + (openPrice * Symbol.TakeProfit)));
+                            chartModel.CloseOrders.OpenTimes.Add(item.OpenTime.ToOADate());
                             timeSpan = item.OpenTime.Subtract(openTime);
                             betModel.Status = "Win";
                             WriteHistory();
@@ -290,6 +334,9 @@ namespace Project_04.ViewModels
                             betModel.OpenTime = $"{openTime}";
                             betModel.ClosePrice = "NoPrice";
                             betModel.CloseTime = $"{item.OpenTime}";
+
+                            chartModel.CloseOrders.OpenPrices.Add(Decimal.ToDouble(openPrice));
+                            chartModel.CloseOrders.OpenTimes.Add(item.OpenTime.ToOADate());
                             timeSpan = item.OpenTime.Subtract(openTime);
                             WriteHistory();
                             Symbol.BetIndefinite += 1;
@@ -303,6 +350,8 @@ namespace Project_04.ViewModels
                             betModel.OpenTime = $"{openTime}";
                             betModel.ClosePrice = $"{openPrice - (openPrice * Symbol.TakeProfit)}";
                             betModel.CloseTime = $"{item.OpenTime}";
+                            chartModel.CloseOrders.OpenPrices.Add(Decimal.ToDouble(openPrice - (openPrice * Symbol.TakeProfit)));
+                            chartModel.CloseOrders.OpenTimes.Add(item.OpenTime.ToOADate());
                             timeSpan = item.OpenTime.Subtract(openTime);
 
                             betModel.Status = "Win";
@@ -316,8 +365,10 @@ namespace Project_04.ViewModels
                             Symbol.IsLongTP = true;
                             betModel.OpenPrice = $"{openPrice}";
                             betModel.OpenTime = $"{openTime}";
-                            betModel.ClosePrice = $"{openPrice + (openPrice * Symbol.TakeProfit)}";
+                            betModel.ClosePrice = $"{openPrice + (openPrice * Symbol.StopLoss)}";
                             betModel.CloseTime = $"{item.OpenTime}";
+                            chartModel.CloseOrders.OpenPrices.Add(Decimal.ToDouble(openPrice + (openPrice * Symbol.StopLoss)));
+                            chartModel.CloseOrders.OpenTimes.Add(item.OpenTime.ToOADate());
                             timeSpan = item.OpenTime.Subtract(openTime);
 
                             betModel.Status = "Lose";
@@ -379,6 +430,7 @@ namespace Project_04.ViewModels
             Symbol.BetPlus = 0;
             Symbol.BetMinus = 0;
             Symbol.BetIndefinite = 0;
+            chartModel = new();
         }
 
         private void WriteLog(string text)

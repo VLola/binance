@@ -105,6 +105,16 @@ namespace Project_04.Models
                 OnPropertyChanged("AverageTwoDay");
             }
         }
+        private DateTime _openTime { get; set; }
+        public DateTime OpenTime
+        {
+            get { return _openTime; }
+            set
+            {
+                _openTime = value;
+                OnPropertyChanged("OpenTime");
+            }
+        }
 
         private bool _isLongTP { get; set; }
         public bool IsLongTP

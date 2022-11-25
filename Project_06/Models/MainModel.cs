@@ -17,8 +17,9 @@ namespace Project_06.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
-        public ObservableCollection<string> Symbols { get; set; } = new();
-        public string SelectedSymbol { get; set; }
+        public ObservableCollection<string> SymbolsName { get; set; } = new();
+        public ObservableCollection<SymbolModel> Symbols { get; set; } = new();
+        public SymbolModel SelectedSymbol { get; set; }
         public WpfPlot MyPlot { get; set; } = new();
     }
 }

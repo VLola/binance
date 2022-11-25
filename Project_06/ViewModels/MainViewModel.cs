@@ -20,6 +20,7 @@ namespace Project_06.ViewModels
 {
     public class MainViewModel
     {
+        
         public FinancePlot financePlot { get; set; }
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         public MainModel MainModel { get; set; }
@@ -49,7 +50,7 @@ namespace Project_06.ViewModels
         }
         private void Start()
         {
-            List<IBinanceKline> binanceKlines = Klines(MainModel.SelectedSymbol, KlineInterval.OneMinute, 450);
+            List<IBinanceKline> binanceKlines = Klines(MainModel.SelectedSymbol.Name, KlineInterval.FifteenMinutes, 450);
             List<OHLC> oHLCs = binanceKlines.Select(item=>new OHLC(
                     open: Decimal.ToDouble(item.OpenPrice),
                     high: Decimal.ToDouble(item.HighPrice),
@@ -59,6 +60,19 @@ namespace Project_06.ViewModels
                     timeSpan: TimeSpan.FromMinutes(1),
                     volume: Decimal.ToDouble(item.Volume)
                 )).ToList();
+            foreach (var item in oHLCs)
+            {
+                if(item.Close > item.Open)
+                {
+                    MainModel.SelectedSymbol.Plus += 1;
+                    MainModel.SelectedSymbol.PlusPercent += Math.Round((item.Close - item.Open) / item.Open * 10000);
+                }
+                else if (item.Close < item.Open)
+                {
+                    MainModel.SelectedSymbol.Minus += 1;
+                    MainModel.SelectedSymbol.MinusPercent += Math.Round((item.Open - item.Close) / item.Close * 10000);
+                }
+            }
             MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
             {
                 MainModel.MyPlot.Plot.RenderLock();
@@ -93,9 +107,9 @@ namespace Project_06.ViewModels
             list.Sort();
             foreach (var it in list)
             {
-                MainModel.Symbols.Add(it);
+                MainModel.SymbolsName.Add(it);
+                MainModel.Symbols.Add(new SymbolModel() { Name = it });
             }
-            MainModel.SelectedSymbol = MainModel.Symbols[0];
         }
         private List<string> ListSymbols()
         {

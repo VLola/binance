@@ -7,6 +7,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -16,9 +20,35 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}"/>
-            <Button Grid.Column="1" Content="Click" Command="{Binding Path=StartCommand}"/>
+            <Button Grid.Column="0" Content="Click" Command="{Binding Path=StartCommand}"/>
         </Grid>
-        <WpfPlot Grid.Row="1" Content="{Binding Path=MainModel.MyPlot}"/>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Name"/>
+                <TextBlock Grid.Column="1" Text="Plus"/>
+                <TextBlock Grid.Column="2" Text="Plus %"/>
+                <TextBlock Grid.Column="3" Text="Minus"/>
+                <TextBlock Grid.Column="4" Text="Minus %"/>
+            </Grid>
+            <ListBox Grid.Row="1" ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:SymbolView/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        <WpfPlot Grid.Column="1" Grid.Row="1" Content="{Binding Path=MainModel.MyPlot}"/>
     </Grid>
 </UserControl>

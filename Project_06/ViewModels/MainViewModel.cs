@@ -3,6 +3,7 @@ using Binance.Net.Enums;
 using Binance.Net.Interfaces;
 using Binance.Net.Objects.Models.Spot;
 using CryptoExchange.Net.CommonObjects;
+using Newtonsoft.Json;
 using Project_06.Command;
 using Project_06.Models;
 using ScottPlot;
@@ -10,6 +11,7 @@ using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,23 +26,40 @@ namespace Project_06.ViewModels
         
         public FinancePlot financePlot { get; set; }
         public ScatterPlot scatterPlot { get; set; }
+        public ScatterPlot scatterPlotIndicatorLong { get; set; }
+        public ScatterPlot scatterPlotIndicatorShort { get; set; }
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
+        private string _pathKlines = $"{Directory.GetCurrentDirectory()}/klines/";
         public MainModel MainModel { get; set; }
         private BinanceClient? _client { get; set; }
         private RelayCommand? _startCommand;
         public RelayCommand StartCommand
         {
-            get { return _startCommand ?? (_startCommand = new RelayCommand(obj => { 
-                //StartNewAlgo(MainModel.SelectedSymbol);
-                GetAllSymbol();
-            })); }
+            get
+            {
+                return _startCommand ?? (_startCommand = new RelayCommand(obj => {
+                    //StartNewAlgo(MainModel.SelectedSymbol);
+                    GetAllSymbol();
+                }));
+            }
+        }
+        private RelayCommand? _saveKlinesCommand;
+        public RelayCommand SaveKlinesCommand
+        {
+            get
+            {
+                return _saveKlinesCommand ?? (_saveKlinesCommand = new RelayCommand(obj => {
+                    //SaveAllSymbol();
+                }));
+            }
         }
         public MainViewModel()
         {
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
+            if (!Directory.Exists(_pathKlines)) Directory.CreateDirectory(_pathKlines);
             _client = new();
             MainModel = new();
-
+            MainModel.PropertyChanged += MainModel_PropertyChanged;
             MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
             {
                 MainModel.MyPlot.Plot.RenderLock();
@@ -65,214 +84,143 @@ namespace Project_06.ViewModels
             }));
             GetSumbolName();
         }
+
+        private void MainModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "SelectedSymbol")
+            {
+                MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
+                {
+                    MainModel.MyPlot.Plot.RenderLock();
+
+                    MainModel.MyPlot.Plot.Remove(financePlot);
+                    MainModel.MyPlot.Plot.Remove(scatterPlot);
+                    financePlot = MainModel.MyPlot.Plot.AddCandlesticks(MainModel.SelectedSymbol.oHLCs.ToArray());
+                    if (MainModel.SelectedSymbol.Algorithms.AlgorithmOne.x.Count > 0)
+                    {
+                        scatterPlot = MainModel.MyPlot.Plot.AddScatter(MainModel.SelectedSymbol.Algorithms.AlgorithmOne.x.ToArray(), MainModel.SelectedSymbol.Algorithms.AlgorithmOne.y.ToArray(), lineWidth: 0);
+                    }
+                    MainModel.MyPlot.Plot.RenderUnlock();
+                    MainModel.MyPlot.Refresh();
+                }));
+
+                MainModel.MyPlotLine.Dispatcher.Invoke(new Action(() =>
+                {
+                    MainModel.MyPlotLine.Plot.RenderLock();
+
+                    MainModel.MyPlotLine.Plot.Remove(scatterPlotIndicatorLong);
+                    MainModel.MyPlotLine.Plot.Remove(scatterPlotIndicatorShort);
+                    scatterPlotIndicatorLong = MainModel.MyPlotLine.Plot.AddScatter(MainModel.SelectedSymbol.Algorithms.AlgorithmOne.xIndicatorLong.ToArray(), MainModel.SelectedSymbol.Algorithms.AlgorithmOne.yIndicatorLong.ToArray(), color: Color.Green, lineWidth: 0);
+                    
+                    scatterPlotIndicatorShort = MainModel.MyPlotLine.Plot.AddScatter(MainModel.SelectedSymbol.Algorithms.AlgorithmOne.xIndicatorShort.ToArray(), MainModel.SelectedSymbol.Algorithms.AlgorithmOne.yIndicatorShort.ToArray(), color: Color.Red, lineWidth: 0);
+
+                    MainModel.MyPlotLine.Plot.RenderUnlock();
+                    MainModel.MyPlotLine.Refresh();
+                }));
+            }
+        }
+
+        private async void SaveAllSymbol()
+        {
+            await Task.Run(() =>
+            {
+                foreach (var item in MainModel.Symbols)
+                {
+                    SaveSymbol(item.Name, DateTime.UtcNow);
+                }
+
+            });
+        }
+        private async void SaveSymbol(string symbol, DateTime dateTime)
+        {
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    List<IBinanceKline> binanceKlines = new();
+                    for (int i = 0; i < 36; i++)
+                    {
+                        List<IBinanceKline>? list = Klines(symbol, KlineInterval.FifteenMinutes, 480, endTime: dateTime);
+                        if (list == null) break;
+                        else
+                        {
+                            binanceKlines.InsertRange(0, list);
+                            dateTime = dateTime.AddMinutes(-480 * 15);
+                            ShowLoad();
+                            await Task.Delay(10000);
+                        }
+                    }
+                    File.WriteAllText(_pathKlines + symbol, JsonConvert.SerializeObject(binanceKlines));
+                });
+            }
+            catch (Exception ex)
+            {
+                WriteLog("Error SaveSymbol: " + ex);
+            }
+        }
+        private async void ShowLoad()
+        {
+            await Task.Run(async () =>
+            {
+                MainModel.IsLoading = true;
+                await Task.Delay(200);
+                MainModel.IsLoading = false;
+            });
+        }
         private async void GetAllSymbol()
         {
             await Task.Run(() =>
             {
                 foreach (var item in MainModel.Symbols)
                 {
-                    StartNewAlgo(item);
-                    MainModel.Plus += item.Plus;
-                    MainModel.PlusPercent += item.PlusPercent;
-                    MainModel.Minus += item.Minus;
-                    MainModel.MinusPercent += item.MinusPercent;
+                    GetSymbol(item);
                 }
+
+            });
+        }
+        private async void GetSymbol(SymbolModel symbolModel)
+        {
+            await Task.Run(() =>
+            {
+                StartNewAlgo(symbolModel);
+
+                symbolModel.Plus = symbolModel.Algorithms.AlgorithmOne.Plus;
+                symbolModel.Minus = symbolModel.Algorithms.AlgorithmOne.Minus;
+                symbolModel.PlusPercent = symbolModel.Algorithms.AlgorithmOne.PlusPercent;
+                symbolModel.MinusPercent = symbolModel.Algorithms.AlgorithmOne.MinusPercent;
+
+                MainModel.Plus += symbolModel.Plus;
+                MainModel.PlusPercent += symbolModel.PlusPercent;
+                MainModel.Minus += symbolModel.Minus;
+                MainModel.MinusPercent += symbolModel.MinusPercent;
 
             });
         }
         private void StartNewAlgo(SymbolModel symbolModel)
         {
-            List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.FifteenMinutes, 400);
+            string json = File.ReadAllText(_pathKlines + symbolModel.Name);
+            List<BinanceSpotKline> binanceKlines = JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json);
+            //List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.FifteenMinutes, 400);
 
-            List<OHLC> oHLCs = binanceKlines.Select(item => new OHLC(
+            symbolModel.oHLCs = binanceKlines.Select(item => new OHLC(
                     open: Decimal.ToDouble(item.OpenPrice),
                     high: Decimal.ToDouble(item.HighPrice),
                     low: Decimal.ToDouble(item.LowPrice),
                     close: Decimal.ToDouble(item.ClosePrice),
                     timeStart: item.OpenTime,
-                    timeSpan: TimeSpan.FromMinutes(1),
+                    timeSpan: TimeSpan.FromMinutes(15),
                     volume: Decimal.ToDouble(item.Volume)
                 )).ToList();
 
-            List<double> x = new();
-            List<double> y = new();
-            int mul = 4;
-
-            symbolModel.Plus = 0;
-            symbolModel.PlusPercent = 0;
-            symbolModel.Minus = 0;
-            symbolModel.MinusPercent = 0;
-            for (int i = 0; i < oHLCs.Count - 3; i++)
-            {
-                if(i > 30)
-                {
-                    double sum = 0;
-                    for (int j = i; j > (i - 30); j--)
-                    {
-                        sum += (oHLCs[j].High - oHLCs[j].Low);
-                    }
-                    double average = (sum / 30);
-                    if((oHLCs[i + 1].High - oHLCs[i + 1].Low) > (average * mul))
-                    {
-                        x.Add(oHLCs[i + 1].DateTime.ToOADate());
-                        y.Add(oHLCs[i + 1].Close);
-
-                        //if (oHLCs[i + 1].Close > oHLCs[i -30].Close) 
-                        if (oHLCs[i + 1].Close < oHLCs[i + 1].Open)
-                        {
-                            // Short
-                            if (oHLCs[i + 1].Close > oHLCs[i + 2].Close)
-                            {
-                                symbolModel.Plus += 1;
-                                symbolModel.PlusPercent += Math.Round((oHLCs[i + 1].Close - oHLCs[i + 2].Close) / oHLCs[i + 2].Close * 10000);
-                            }
-                            else
-                            {
-                                symbolModel.Minus += 1;
-                                symbolModel.MinusPercent += Math.Round((oHLCs[i + 2].Close - oHLCs[i + 1].Close) / oHLCs[i + 1].Close * 10000);
-                            }
-                        }
-                        else
-                        {
-                            // Long
-                            if (oHLCs[i + 1].Close < oHLCs[i + 2].Close)
-                            {
-                                symbolModel.Plus += 1;
-                                symbolModel.PlusPercent += Math.Round((oHLCs[i + 2].Close - oHLCs[i + 1].Close) / oHLCs[i + 1].Close * 10000);
-                            }
-                            else
-                            {
-                                symbolModel.Minus += 1;
-                                symbolModel.MinusPercent += Math.Round((oHLCs[i + 1].Close - oHLCs[i + 2].Close) / oHLCs[i + 2].Close * 10000);
-                            }
-                        }
-
-                    }
-                }
-            }
-
-
-
-            //MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
-            //{
-            //    MainModel.MyPlot.Plot.RenderLock();
-
-            //    MainModel.MyPlot.Plot.Remove(financePlot);
-            //    MainModel.MyPlot.Plot.Remove(scatterPlot);
-            //    financePlot = MainModel.MyPlot.Plot.AddCandlesticks(oHLCs.ToArray());
-            //    if (x.Count > 0)
-            //    {
-            //        scatterPlot = MainModel.MyPlot.Plot.AddScatter(x.ToArray(), y.ToArray(), lineWidth: 0);
-            //    }
-
-            //    MainModel.MyPlot.Plot.RenderUnlock();
-            //    MainModel.MyPlot.Refresh();
-            //}));
+            symbolModel.Algorithms.CalculateAlgorithmOne(symbolModel);
 
         }
-        //private void Start()
-        //{
-        //    List<IBinanceKline> binanceKlines = Klines(MainModel.SelectedSymbol.Name, KlineInterval.FifteenMinutes, 200);
-
-        //    List<IBinanceKline> binanceKlinesNew = new List<IBinanceKline>();
-
-        //    for (int i = 0; i < binanceKlines.Count - 1; i++)
-        //    {
-        //        if(i > (binanceKlines.Count / 2)) binanceKlinesNew.Add(binanceKlines[i]);
-        //    }
-
-        //    List<OHLC> oHLCs = binanceKlinesNew.Select(item=>new OHLC(
-        //            open: Decimal.ToDouble(item.OpenPrice),
-        //            high: Decimal.ToDouble(item.HighPrice),
-        //            low: Decimal.ToDouble(item.LowPrice),
-        //            close: Decimal.ToDouble(item.ClosePrice),
-        //            timeStart: item.OpenTime,
-        //            timeSpan: TimeSpan.FromMinutes(1),
-        //            volume: Decimal.ToDouble(item.Volume)
-        //        )).ToList();
-
-        //    List<double> x = new();
-        //    List<double> y = new();
-        //    List<int> jlist = new();
-        //    int time = -oHLCs.Count * 15;
-
-        //    for (int i = 0; i < oHLCs.Count - 1; i++)
-        //    {
-        //        decimal minus = 0m;
-        //        decimal plus = 0m;
-        //        int plusBet = 0;
-        //        int minusBet = 0;
-        //        DateTime dateTime = DateTime.Now;
-        //        foreach (var item in binanceKlines)
-        //        {
-        //            if (item.OpenTime <= oHLCs[i].DateTime.AddMinutes(15) && item.OpenTime >= oHLCs[i].DateTime.AddMinutes(time))
-        //            {
-        //                if (item.ClosePrice > item.OpenPrice)
-        //                {
-        //                    plusBet++;
-        //                    plus += Math.Round((item.ClosePrice - item.OpenPrice) / item.OpenPrice * 10000);
-        //                }
-        //                else if (item.ClosePrice < item.OpenPrice)
-        //                {
-        //                    minusBet++;
-        //                    minus += Math.Round((item.OpenPrice - item.ClosePrice) / item.ClosePrice * 10000);
-        //                }
-        //                dateTime = item.OpenTime;
-        //            }
-        //        }
-        //        if (plusBet > minusBet && plus < minus || plusBet < minusBet && plus > minus)
-        //        {
-        //            decimal result = plus / minus;
-        //            y.Add(Decimal.ToDouble(result));
-        //            x.Add(dateTime.ToOADate());
-        //        }
-        //    }
-
-        //    string path = Directory.GetCurrentDirectory() + "/log.txt";
-        //    File.WriteAllText(path, JsonSerializer.Serialize(jlist));
-
-        //    foreach (var item in oHLCs)
-        //    {
-        //        if(item.Close > item.Open)
-        //        {
-        //            MainModel.SelectedSymbol.Plus += 1;
-        //            MainModel.SelectedSymbol.PlusPercent += Math.Round((item.Close - item.Open) / item.Open * 10000);
-        //        }
-        //        else if (item.Close < item.Open)
-        //        {
-        //            MainModel.SelectedSymbol.Minus += 1;
-        //            MainModel.SelectedSymbol.MinusPercent += Math.Round((item.Open - item.Close) / item.Close * 10000);
-        //        }
-        //    }
-        //    oHLCs.RemoveAt(0);
-        //    MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
-        //    {
-        //        MainModel.MyPlot.Plot.RenderLock();
-
-        //        MainModel.MyPlot.Plot.Remove(financePlot);
-        //        financePlot = MainModel.MyPlot.Plot.AddCandlesticks(oHLCs.ToArray());
-
-        //        MainModel.MyPlot.Plot.RenderUnlock();
-        //        MainModel.MyPlot.Refresh();
-        //    })); 
-
-        //    MainModel.MyPlotLine.Dispatcher.Invoke(new Action(() =>
-        //    {
-        //        MainModel.MyPlotLine.Plot.RenderLock();
-
-        //        MainModel.MyPlotLine.Plot.Remove(scatterPlot);
-        //        scatterPlot = MainModel.MyPlotLine.Plot.AddScatter(x.ToArray(), y.ToArray());
-
-        //        MainModel.MyPlotLine.Plot.RenderUnlock();
-        //        MainModel.MyPlotLine.Refresh();
-        //    }));
-        //}
+        
         public List<IBinanceKline> Klines(string symbol, KlineInterval interval, int limit)
         {
             try
             {
-                var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, limit: limit, startTime: DateTime.UtcNow.AddDays(-15)).Result;
-                //var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, limit: limit).Result;
+                var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, limit: limit).Result;
                 if (!result.Success) WriteLog("Error Candles");
                 else
                 {
@@ -282,6 +230,23 @@ namespace Project_06.ViewModels
             catch (Exception e)
             {
                 WriteLog($"Candles {e.Message}");
+            }
+            return null;
+        }
+        public List<IBinanceKline>? Klines(string symbol, KlineInterval interval, int limit, DateTime? startTime = null, DateTime? endTime = null)
+        {
+            try
+            {
+                var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, startTime: startTime, endTime: endTime, limit: limit).Result;
+                if (!result.Success) WriteLog("Error Klines");
+                else
+                {
+                    return result.Data.ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                WriteLog($"Klines {e.Message}");
             }
             return null;
         }

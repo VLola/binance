@@ -17,6 +17,8 @@ namespace Project_06.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
+        public List<OHLC> oHLCs { get; set; }
+        public Algorithms Algorithms { get; set; } = new();
         private string _name { get; set; }
         public string Name
         {
@@ -67,6 +69,5 @@ namespace Project_06.Models
                 OnPropertyChanged("MinusPercent");
             }
         }
-        public ObservableCollection<OHLC> Candles { get; set; }
     }
 }

@@ -19,10 +19,28 @@ namespace Project_06.Models
         }
         public ObservableCollection<string> SymbolsName { get; set; } = new();
         public ObservableCollection<SymbolModel> Symbols { get; set; } = new();
-        public SymbolModel SelectedSymbol { get; set; }
         public WpfPlot MyPlot { get; set; } = new();
         public WpfPlot MyPlotLine { get; set; } = new();
-
+        private SymbolModel _selectedSymbol { get; set; }
+        public SymbolModel SelectedSymbol
+        {
+            get { return _selectedSymbol; }
+            set
+            {
+                _selectedSymbol = value;
+                OnPropertyChanged("SelectedSymbol");
+            }
+        }
+        private bool _isLoading { get; set; }
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged("IsLoading");
+            }
+        }
         private int _plus { get; set; } = 0;
         public int Plus
         {

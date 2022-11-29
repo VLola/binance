@@ -82,7 +82,7 @@ namespace Project_06.ViewModels
         }
         private void StartNewAlgo(SymbolModel symbolModel)
         {
-            List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.OneMinute, 400);
+            List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.FifteenMinutes, 400);
 
             List<OHLC> oHLCs = binanceKlines.Select(item => new OHLC(
                     open: Decimal.ToDouble(item.OpenPrice),
@@ -96,7 +96,7 @@ namespace Project_06.ViewModels
 
             List<double> x = new();
             List<double> y = new();
-            int mul = 10;
+            int mul = 4;
 
             symbolModel.Plus = 0;
             symbolModel.PlusPercent = 0;
@@ -117,6 +117,7 @@ namespace Project_06.ViewModels
                         x.Add(oHLCs[i + 1].DateTime.ToOADate());
                         y.Add(oHLCs[i + 1].Close);
 
+                        //if (oHLCs[i + 1].Close > oHLCs[i -30].Close) 
                         if (oHLCs[i + 1].Close < oHLCs[i + 1].Open)
                         {
                             // Short
@@ -270,8 +271,8 @@ namespace Project_06.ViewModels
         {
             try
             {
-                //var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, limit: limit, startTime: DateTime.UtcNow.AddDays(-30)).Result;
-                var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, limit: limit).Result;
+                var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, limit: limit, startTime: DateTime.UtcNow.AddDays(-15)).Result;
+                //var result = _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(symbol: symbol, interval: interval, limit: limit).Result;
                 if (!result.Success) WriteLog("Error Candles");
                 else
                 {

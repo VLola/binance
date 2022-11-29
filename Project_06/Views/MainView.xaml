@@ -16,12 +16,19 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Click" Command="{Binding Path=StartCommand}"/>
+            <TextBlock Grid.Column="1" Text="{Binding Path=MainModel.Plus,StringFormat=Plus: {0}}"/>
+            <TextBlock Grid.Column="2" Text="{Binding Path=MainModel.PlusPercent,StringFormat=PlusPercent: {0}}"/>
+            <TextBlock Grid.Column="3" Text="{Binding Path=MainModel.Minus,StringFormat=Minus: {0}}"/>
+            <TextBlock Grid.Column="4" Text="{Binding Path=MainModel.MinusPercent,StringFormat=MinusPercent: {0}}"/>
         </Grid>
         <Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>

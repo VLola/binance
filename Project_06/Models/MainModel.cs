@@ -22,5 +22,46 @@ namespace Project_06.Models
         public SymbolModel SelectedSymbol { get; set; }
         public WpfPlot MyPlot { get; set; } = new();
         public WpfPlot MyPlotLine { get; set; } = new();
+
+        private int _plus { get; set; } = 0;
+        public int Plus
+        {
+            get { return _plus; }
+            set
+            {
+                _plus = value;
+                OnPropertyChanged("Plus");
+            }
+        }
+        private int _minus { get; set; } = 0;
+        public int Minus
+        {
+            get { return _minus; }
+            set
+            {
+                _minus = value;
+                OnPropertyChanged("Minus");
+            }
+        }
+        private double _plusPercent { get; set; } = 0;
+        public double PlusPercent
+        {
+            get { return _plusPercent; }
+            set
+            {
+                _plusPercent = value;
+                OnPropertyChanged("PlusPercent");
+            }
+        }
+        private double _minusPercent { get; set; } = 0;
+        public double MinusPercent
+        {
+            get { return _minusPercent; }
+            set
+            {
+                _minusPercent = value;
+                OnPropertyChanged("MinusPercent");
+            }
+        }
     }
 }

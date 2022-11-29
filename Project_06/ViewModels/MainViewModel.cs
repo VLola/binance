@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -22,13 +23,14 @@ namespace Project_06.ViewModels
     {
         
         public FinancePlot financePlot { get; set; }
+        public ScatterPlot scatterPlot { get; set; }
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         public MainModel MainModel { get; set; }
         private BinanceClient? _client { get; set; }
         private RelayCommand? _startCommand;
         public RelayCommand StartCommand
         {
-            get { return _startCommand ?? (_startCommand = new RelayCommand(obj => { Start(); })); }
+            get { return _startCommand ?? (_startCommand = new RelayCommand(obj => { StartNewAlgo(); })); }
         }
         public MainViewModel()
         {
@@ -41,17 +43,31 @@ namespace Project_06.ViewModels
                 MainModel.MyPlot.Plot.RenderLock();
                 MainModel.MyPlot.Plot.Style(ScottPlot.Style.Gray2);
                 MainModel.MyPlot.Plot.XAxis.TickLabelFormat("HH:mm:ss", dateTimeFormat: true);
+                MainModel.MyPlot.Plot.YAxis.Hide();
                 MainModel.MyPlot.Configuration.LeftClickDragPan = true;
                 MainModel.MyPlot.Configuration.RightClickDragZoom = false;
                 MainModel.MyPlot.Configuration.Pan = false;
                 MainModel.MyPlot.Plot.RenderUnlock();
+            })); 
+            MainModel.MyPlotLine.Dispatcher.Invoke(new Action(() =>
+            {
+                MainModel.MyPlotLine.Plot.RenderLock();
+                MainModel.MyPlotLine.Plot.Style(ScottPlot.Style.Gray2);
+                MainModel.MyPlotLine.Plot.XAxis.TickLabelFormat("HH:mm:ss", dateTimeFormat: true);
+                MainModel.MyPlotLine.Plot.YAxis.Hide();
+                MainModel.MyPlotLine.Configuration.LeftClickDragPan = true;
+                MainModel.MyPlotLine.Configuration.RightClickDragZoom = false;
+                MainModel.MyPlotLine.Configuration.Pan = false;
+                MainModel.MyPlotLine.Plot.RenderUnlock();
             }));
             GetSumbolName();
         }
-        private void Start()
+        private void StartNewAlgo()
         {
-            List<IBinanceKline> binanceKlines = Klines(MainModel.SelectedSymbol.Name, KlineInterval.FifteenMinutes, 450);
-            List<OHLC> oHLCs = binanceKlines.Select(item=>new OHLC(
+            List<IBinanceKline> binanceKlines = Klines(MainModel.SelectedSymbol.Name, KlineInterval.FifteenMinutes, 400);
+
+
+            List<OHLC> oHLCs = binanceKlines.Select(item => new OHLC(
                     open: Decimal.ToDouble(item.OpenPrice),
                     high: Decimal.ToDouble(item.HighPrice),
                     low: Decimal.ToDouble(item.LowPrice),
@@ -60,6 +76,114 @@ namespace Project_06.ViewModels
                     timeSpan: TimeSpan.FromMinutes(1),
                     volume: Decimal.ToDouble(item.Volume)
                 )).ToList();
+
+            List<double> x = new();
+            List<double> y = new();
+            int mul = 4;
+
+            for (int i = 0; i < oHLCs.Count - 2; i++)
+            {
+                if(i > 30)
+                {
+                    double sum = 0;
+                    for (int j = i; j > (i - 30); j--)
+                    {
+                        //if (oHLCs[j].Open > oHLCs[j].Close) {
+                        //    sum += oHLCs[j].Open - oHLCs[j].Close;
+                        //}
+                        //else
+                        //{
+                        //    sum += oHLCs[j].Close - oHLCs[j].Open;
+                        //}
+                        sum += (oHLCs[j].High - oHLCs[j].Low);
+                    }
+                    double average = (sum / 30);
+                    if((oHLCs[i + 1].High - oHLCs[i + 1].Low) > (average * mul))
+                    {
+                        x.Add(oHLCs[i + 1].DateTime.ToOADate());
+                        y.Add(oHLCs[i + 1].Close);
+                    }
+                }
+            }
+
+            MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
+            {
+                MainModel.MyPlot.Plot.RenderLock();
+
+                MainModel.MyPlot.Plot.Remove(financePlot);
+                MainModel.MyPlot.Plot.Remove(scatterPlot);
+                financePlot = MainModel.MyPlot.Plot.AddCandlesticks(oHLCs.ToArray());
+                if(x.Count> 0)
+                {
+                    scatterPlot = MainModel.MyPlot.Plot.AddScatter(x.ToArray(), y.ToArray(), lineWidth: 0);
+                }
+
+                MainModel.MyPlot.Plot.RenderUnlock();
+                MainModel.MyPlot.Refresh();
+            }));
+
+        }
+        private void Start()
+        {
+            List<IBinanceKline> binanceKlines = Klines(MainModel.SelectedSymbol.Name, KlineInterval.FifteenMinutes, 200);
+
+            List<IBinanceKline> binanceKlinesNew = new List<IBinanceKline>();
+
+            for (int i = 0; i < binanceKlines.Count - 1; i++)
+            {
+                if(i > (binanceKlines.Count / 2)) binanceKlinesNew.Add(binanceKlines[i]);
+            }
+
+            List<OHLC> oHLCs = binanceKlinesNew.Select(item=>new OHLC(
+                    open: Decimal.ToDouble(item.OpenPrice),
+                    high: Decimal.ToDouble(item.HighPrice),
+                    low: Decimal.ToDouble(item.LowPrice),
+                    close: Decimal.ToDouble(item.ClosePrice),
+                    timeStart: item.OpenTime,
+                    timeSpan: TimeSpan.FromMinutes(1),
+                    volume: Decimal.ToDouble(item.Volume)
+                )).ToList();
+
+            List<double> x = new();
+            List<double> y = new();
+            List<int> jlist = new();
+            int time = -oHLCs.Count * 15;
+
+            for (int i = 0; i < oHLCs.Count - 1; i++)
+            {
+                decimal minus = 0m;
+                decimal plus = 0m;
+                int plusBet = 0;
+                int minusBet = 0;
+                DateTime dateTime = DateTime.Now;
+                foreach (var item in binanceKlines)
+                {
+                    if (item.OpenTime <= oHLCs[i].DateTime.AddMinutes(15) && item.OpenTime >= oHLCs[i].DateTime.AddMinutes(time))
+                    {
+                        if (item.ClosePrice > item.OpenPrice)
+                        {
+                            plusBet++;
+                            plus += Math.Round((item.ClosePrice - item.OpenPrice) / item.OpenPrice * 10000);
+                        }
+                        else if (item.ClosePrice < item.OpenPrice)
+                        {
+                            minusBet++;
+                            minus += Math.Round((item.OpenPrice - item.ClosePrice) / item.ClosePrice * 10000);
+                        }
+                        dateTime = item.OpenTime;
+                    }
+                }
+                if (plusBet > minusBet && plus < minus || plusBet < minusBet && plus > minus)
+                {
+                    decimal result = plus / minus;
+                    y.Add(Decimal.ToDouble(result));
+                    x.Add(dateTime.ToOADate());
+                }
+            }
+
+            string path = Directory.GetCurrentDirectory() + "/log.txt";
+            File.WriteAllText(path, JsonSerializer.Serialize(jlist));
+
             foreach (var item in oHLCs)
             {
                 if(item.Close > item.Open)
@@ -73,6 +197,7 @@ namespace Project_06.ViewModels
                     MainModel.SelectedSymbol.MinusPercent += Math.Round((item.Open - item.Close) / item.Close * 10000);
                 }
             }
+            oHLCs.RemoveAt(0);
             MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
             {
                 MainModel.MyPlot.Plot.RenderLock();
@@ -82,6 +207,17 @@ namespace Project_06.ViewModels
 
                 MainModel.MyPlot.Plot.RenderUnlock();
                 MainModel.MyPlot.Refresh();
+            })); 
+
+            MainModel.MyPlotLine.Dispatcher.Invoke(new Action(() =>
+            {
+                MainModel.MyPlotLine.Plot.RenderLock();
+
+                MainModel.MyPlotLine.Plot.Remove(scatterPlot);
+                scatterPlot = MainModel.MyPlotLine.Plot.AddScatter(x.ToArray(), y.ToArray());
+
+                MainModel.MyPlotLine.Plot.RenderUnlock();
+                MainModel.MyPlotLine.Refresh();
             }));
         }
         public List<IBinanceKline> Klines(string symbol, KlineInterval interval, int limit)

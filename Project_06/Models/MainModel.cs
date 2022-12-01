@@ -81,24 +81,14 @@ namespace Project_06.Models
                 OnPropertyChanged("MinusPercent");
             }
         }
-        private bool _one { get; set; } = true;
-        public bool One
+        private int _number { get; set; } = 0;
+        public int Number
         {
-            get { return _one; }
+            get { return _number; }
             set
             {
-                _one = value;
-                OnPropertyChanged("One");
-            }
-        }
-        private bool _two { get; set; }
-        public bool Two
-        {
-            get { return _two; }
-            set
-            {
-                _two = value;
-                OnPropertyChanged("Two");
+                _number = value;
+                OnPropertyChanged("Number");
             }
         }
     }

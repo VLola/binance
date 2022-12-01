@@ -45,8 +45,8 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <RadioButton Grid.Column="0" Content="One" IsChecked="{Binding Path=MainModel.One}" HorizontalAlignment="Center"/>
-                <RadioButton Grid.Column="1" Content="Two" IsChecked="{Binding Path=MainModel.Two}" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Text="Number:"/>
+                <TextBox Grid.Column="1" Text="{Binding Path=MainModel.Number}"/>
             </Grid>
             <TextBlock Grid.Column="2" Text="{Binding Path=MainModel.Plus,StringFormat=Plus: {0}}"/>
             <TextBlock Grid.Column="3" Text="{Binding Path=MainModel.PlusPercent,StringFormat=PlusPercent: {0}}"/>

@@ -81,5 +81,25 @@ namespace Project_06.Models
                 OnPropertyChanged("MinusPercent");
             }
         }
+        private bool _one { get; set; } = true;
+        public bool One
+        {
+            get { return _one; }
+            set
+            {
+                _one = value;
+                OnPropertyChanged("One");
+            }
+        }
+        private bool _two { get; set; }
+        public bool Two
+        {
+            get { return _two; }
+            set
+            {
+                _two = value;
+                OnPropertyChanged("Two");
+            }
+        }
     }
 }

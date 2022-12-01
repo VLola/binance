@@ -89,6 +89,9 @@ namespace Project_06.ViewModels
         {
             if (e.PropertyName == "SelectedSymbol")
             {
+                AlgorithmModel algorithmModel = new(); ;
+                if (MainModel.One) algorithmModel = MainModel.SelectedSymbol.Algorithms.AlgorithmOne;
+                if (MainModel.Two) algorithmModel = MainModel.SelectedSymbol.Algorithms.AlgorithmTwo;
                 MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
                 {
                     MainModel.MyPlot.Plot.RenderLock();
@@ -96,9 +99,9 @@ namespace Project_06.ViewModels
                     MainModel.MyPlot.Plot.Remove(financePlot);
                     MainModel.MyPlot.Plot.Remove(scatterPlot);
                     financePlot = MainModel.MyPlot.Plot.AddCandlesticks(MainModel.SelectedSymbol.oHLCs.ToArray());
-                    if (MainModel.SelectedSymbol.Algorithms.AlgorithmOne.x.Count > 0)
+                    if (algorithmModel.x.Count > 0)
                     {
-                        scatterPlot = MainModel.MyPlot.Plot.AddScatter(MainModel.SelectedSymbol.Algorithms.AlgorithmOne.x.ToArray(), MainModel.SelectedSymbol.Algorithms.AlgorithmOne.y.ToArray(), lineWidth: 0);
+                        scatterPlot = MainModel.MyPlot.Plot.AddScatter(algorithmModel.x.ToArray(), algorithmModel.y.ToArray(), lineWidth: 0);
                     }
                     MainModel.MyPlot.Plot.RenderUnlock();
                     MainModel.MyPlot.Refresh();
@@ -110,13 +113,44 @@ namespace Project_06.ViewModels
 
                     MainModel.MyPlotLine.Plot.Remove(scatterPlotIndicatorLong);
                     MainModel.MyPlotLine.Plot.Remove(scatterPlotIndicatorShort);
-                    scatterPlotIndicatorLong = MainModel.MyPlotLine.Plot.AddScatter(MainModel.SelectedSymbol.Algorithms.AlgorithmOne.xIndicatorLong.ToArray(), MainModel.SelectedSymbol.Algorithms.AlgorithmOne.yIndicatorLong.ToArray(), color: Color.Green, lineWidth: 0);
+                    scatterPlotIndicatorLong = MainModel.MyPlotLine.Plot.AddScatter(algorithmModel.xIndicatorLong.ToArray(), algorithmModel.yIndicatorLong.ToArray(), color: Color.Green, lineWidth: 0);
                     
-                    scatterPlotIndicatorShort = MainModel.MyPlotLine.Plot.AddScatter(MainModel.SelectedSymbol.Algorithms.AlgorithmOne.xIndicatorShort.ToArray(), MainModel.SelectedSymbol.Algorithms.AlgorithmOne.yIndicatorShort.ToArray(), color: Color.Red, lineWidth: 0);
+                    scatterPlotIndicatorShort = MainModel.MyPlotLine.Plot.AddScatter(algorithmModel.xIndicatorShort.ToArray(), algorithmModel.yIndicatorShort.ToArray(), color: Color.Red, lineWidth: 0);
 
                     MainModel.MyPlotLine.Plot.RenderUnlock();
                     MainModel.MyPlotLine.Refresh();
                 }));
+            }
+            else if (e.PropertyName == "One" && MainModel.One || e.PropertyName == "Two" && MainModel.Two)
+            {
+
+                MainModel.Plus = 0;
+                MainModel.PlusPercent = 0;
+                MainModel.Minus = 0;
+                MainModel.MinusPercent = 0;
+
+                foreach (var symbolModel in MainModel.Symbols)
+                {
+                    if (MainModel.One)
+                    {
+                        symbolModel.Plus = symbolModel.Algorithms.AlgorithmOne.Plus;
+                        symbolModel.Minus = symbolModel.Algorithms.AlgorithmOne.Minus;
+                        symbolModel.PlusPercent = symbolModel.Algorithms.AlgorithmOne.PlusPercent;
+                        symbolModel.MinusPercent = symbolModel.Algorithms.AlgorithmOne.MinusPercent;
+                    }
+                    else if (MainModel.Two)
+                    {
+                        symbolModel.Plus = symbolModel.Algorithms.AlgorithmTwo.Plus;
+                        symbolModel.Minus = symbolModel.Algorithms.AlgorithmTwo.Minus;
+                        symbolModel.PlusPercent = symbolModel.Algorithms.AlgorithmTwo.PlusPercent;
+                        symbolModel.MinusPercent = symbolModel.Algorithms.AlgorithmTwo.MinusPercent;
+                    }
+
+                    MainModel.Plus += symbolModel.Plus;
+                    MainModel.PlusPercent += symbolModel.PlusPercent;
+                    MainModel.Minus += symbolModel.Minus;
+                    MainModel.MinusPercent += symbolModel.MinusPercent;
+                }
             }
         }
 
@@ -184,10 +218,20 @@ namespace Project_06.ViewModels
             {
                 StartNewAlgo(symbolModel);
 
-                symbolModel.Plus = symbolModel.Algorithms.AlgorithmOne.Plus;
-                symbolModel.Minus = symbolModel.Algorithms.AlgorithmOne.Minus;
-                symbolModel.PlusPercent = symbolModel.Algorithms.AlgorithmOne.PlusPercent;
-                symbolModel.MinusPercent = symbolModel.Algorithms.AlgorithmOne.MinusPercent;
+                if (MainModel.One)
+                {
+                    symbolModel.Plus = symbolModel.Algorithms.AlgorithmOne.Plus;
+                    symbolModel.Minus = symbolModel.Algorithms.AlgorithmOne.Minus;
+                    symbolModel.PlusPercent = symbolModel.Algorithms.AlgorithmOne.PlusPercent;
+                    symbolModel.MinusPercent = symbolModel.Algorithms.AlgorithmOne.MinusPercent;
+                }
+                else if (MainModel.Two)
+                {
+                    symbolModel.Plus = symbolModel.Algorithms.AlgorithmTwo.Plus;
+                    symbolModel.Minus = symbolModel.Algorithms.AlgorithmTwo.Minus;
+                    symbolModel.PlusPercent = symbolModel.Algorithms.AlgorithmTwo.PlusPercent;
+                    symbolModel.MinusPercent = symbolModel.Algorithms.AlgorithmTwo.MinusPercent;
+                }
 
                 MainModel.Plus += symbolModel.Plus;
                 MainModel.PlusPercent += symbolModel.PlusPercent;
@@ -213,6 +257,7 @@ namespace Project_06.ViewModels
                 )).ToList();
 
             symbolModel.Algorithms.CalculateAlgorithmOne(symbolModel);
+            symbolModel.Algorithms.CalculateAlgorithmTwo(symbolModel);
 
         }
         

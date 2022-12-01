@@ -19,6 +19,7 @@ namespace Project_06.Models
         }
         public ObservableCollection<string> SymbolsName { get; set; } = new();
         public ObservableCollection<SymbolModel> Symbols { get; set; } = new();
+        public ObservableCollection<StatisticsModel> Statistics { get; set; } = new();
         public WpfPlot MyPlot { get; set; } = new();
         public WpfPlot MyPlotLine { get; set; } = new();
         private SymbolModel _selectedSymbol { get; set; }

@@ -157,9 +157,16 @@ namespace Project_06.Models
         }
         public void CalculateAlgorithmTwo(SymbolModel symbolModel)
         {
+            for (int i = 2; i < 20; i++)
+            {
+                AlgorithmTwo(symbolModel, i);
+            }
+            
+        }
 
+        private void AlgorithmTwo(SymbolModel symbolModel, int mul)
+        {
             AlgorithmModel algorithmModel = new AlgorithmModel();
-            int mul = 4;
 
             double indicator = 0;
             algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[0].DateTime.ToOADate());

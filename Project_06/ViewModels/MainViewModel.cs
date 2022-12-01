@@ -53,6 +53,16 @@ namespace Project_06.ViewModels
                 }));
             }
         }
+        private RelayCommand? _calculateStatisticsCommand;
+        public RelayCommand CalculateStatisticsCommand
+        {
+            get
+            {
+                return _calculateStatisticsCommand ?? (_calculateStatisticsCommand = new RelayCommand(obj => {
+                    CalculateStatistics();
+                }));
+            }
+        }
         public MainViewModel()
         {
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
@@ -148,6 +158,39 @@ namespace Project_06.ViewModels
                 MainModel.MyPlotLine.Plot.RenderUnlock();
                 MainModel.MyPlotLine.Refresh();
             }));
+        }
+        private void CalculateStatistics()
+        {
+            MainModel.Statistics.Clear();
+            for (int i = 0; i < MainModel.Symbols[0].Algorithms.ListAlgorithms.Count - 1; i++)
+            {
+                int plus = 0;
+                int minus = 0;
+                double plusPercent = 0;
+                double minusPercent = 0;
+                foreach (var symbolModel in MainModel.Symbols)
+                {
+                    symbolModel.Plus = symbolModel.Algorithms.ListAlgorithms[i].Plus;
+                    symbolModel.Minus = symbolModel.Algorithms.ListAlgorithms[i].Minus;
+                    symbolModel.PlusPercent = symbolModel.Algorithms.ListAlgorithms[i].PlusPercent;
+                    symbolModel.MinusPercent = symbolModel.Algorithms.ListAlgorithms[i].MinusPercent;
+
+                    plus += symbolModel.Plus;
+                    plusPercent += symbolModel.PlusPercent;
+                    minus += symbolModel.Minus;
+                    minusPercent += symbolModel.MinusPercent;
+                }
+                StatisticsModel statisticsModel = new();
+                statisticsModel.Plus = plus;
+                statisticsModel.Minus = minus;
+                statisticsModel.PlusPercent = plusPercent;
+                statisticsModel.MinusPercent = minusPercent;
+                statisticsModel.Win = Math.Round(plusPercent / minusPercent, 2);
+                statisticsModel.Number = i;
+                MainModel.Statistics.Add(statisticsModel);
+            }
+            
+
         }
         private async void SaveAllSymbol()
         {

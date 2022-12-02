@@ -51,7 +51,7 @@ namespace Project_06.ViewModels
             get
             {
                 return _saveKlinesCommand ?? (_saveKlinesCommand = new RelayCommand(obj => {
-                    //SaveAllSymbol();
+                    SaveAllSymbol();
                 }));
             }
         }
@@ -66,8 +66,11 @@ namespace Project_06.ViewModels
             {
                 MainModel.MyPlot.Plot.RenderLock();
                 MainModel.MyPlot.Plot.Style(ScottPlot.Style.Gray2);
-                MainModel.MyPlot.Plot.XAxis.TickLabelFormat("HH:mm:ss", dateTimeFormat: true);
+                //MainModel.MyPlot.Plot.XAxis.TickLabelFormat("HH:mm:ss", dateTimeFormat: true);
+                MainModel.MyPlot.Plot.XAxis.Hide();
+                MainModel.MyPlot.Plot.XAxis2.Hide();
                 MainModel.MyPlot.Plot.YAxis.Hide();
+                MainModel.MyPlot.Plot.YAxis2.Hide();
                 MainModel.MyPlot.Configuration.LeftClickDragPan = true;
                 MainModel.MyPlot.Configuration.RightClickDragZoom = false;
                 MainModel.MyPlot.Configuration.Pan = false;
@@ -77,8 +80,11 @@ namespace Project_06.ViewModels
             {
                 MainModel.MyPlotLine.Plot.RenderLock();
                 MainModel.MyPlotLine.Plot.Style(ScottPlot.Style.Gray2);
-                MainModel.MyPlotLine.Plot.XAxis.TickLabelFormat("HH:mm:ss", dateTimeFormat: true);
+                //MainModel.MyPlotLine.Plot.XAxis.TickLabelFormat("HH:mm:ss", dateTimeFormat: true);
+                MainModel.MyPlotLine.Plot.XAxis.Hide();
+                MainModel.MyPlotLine.Plot.XAxis2.Hide();
                 MainModel.MyPlotLine.Plot.YAxis.Hide();
+                MainModel.MyPlotLine.Plot.YAxis2.Hide();
                 MainModel.MyPlotLine.Configuration.LeftClickDragPan = true;
                 MainModel.MyPlotLine.Configuration.RightClickDragZoom = false;
                 MainModel.MyPlotLine.Configuration.Pan = false;
@@ -256,21 +262,27 @@ namespace Project_06.ViewModels
 
             });
         }
+        int Interval = 5;
+        int Size = 110;
         private async void SaveSymbol(string symbol, DateTime dateTime)
         {
             try
             {
                 await Task.Run(async () =>
                 {
+                    KlineInterval klineInterval = KlineInterval.OneMinute;
+                    if(Interval == 5) klineInterval = KlineInterval.FiveMinutes;
+                    else if(Interval == 15) klineInterval = KlineInterval.FifteenMinutes;
+
                     List<IBinanceKline> binanceKlines = new();
-                    for (int i = 0; i < 36; i++)
+                    for (int i = 0; i < Size; i++)
                     {
-                        List<IBinanceKline>? list = Klines(symbol, KlineInterval.FifteenMinutes, 480, endTime: dateTime);
+                        List<IBinanceKline>? list = Klines(symbol, klineInterval, 480, endTime: dateTime);
                         if (list == null) break;
                         else
                         {
                             binanceKlines.InsertRange(0, list);
-                            dateTime = dateTime.AddMinutes(-480 * 15);
+                            dateTime = dateTime.AddMinutes(-480 * Interval);
                             ShowLoad();
                             await Task.Delay(10000);
                         }
@@ -310,7 +322,7 @@ namespace Project_06.ViewModels
         }
         private async Task GetSymbol(SymbolModel symbolModel)
         {
-            await Task.Run(() =>
+            await Task.Run(async() =>
             {
                 StartNewAlgo(symbolModel);
 
@@ -329,25 +341,27 @@ namespace Project_06.ViewModels
         private void StartNewAlgo(SymbolModel symbolModel)
         {
             string json = File.ReadAllText(_pathKlines + symbolModel.Name);
-            List<BinanceSpotKline> binanceKlines = JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json);
-            //List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.FifteenMinutes, 400);
+            List<BinanceSpotKline>? binanceKlines = JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json);
+            //List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.OneMinute, 400);
 
-            symbolModel.oHLCs = binanceKlines.Select(item => new OHLC(
-                    open: Decimal.ToDouble(item.OpenPrice),
-                    high: Decimal.ToDouble(item.HighPrice),
-                    low: Decimal.ToDouble(item.LowPrice),
-                    close: Decimal.ToDouble(item.ClosePrice),
-                    timeStart: item.OpenTime,
-                    timeSpan: TimeSpan.FromMinutes(15),
-                    volume: Decimal.ToDouble(item.Volume)
-                )).ToList();
+            if (binanceKlines != null)
+            {
+                symbolModel.oHLCs = binanceKlines.Select(item => new OHLC(
+                        open: Decimal.ToDouble(item.OpenPrice),
+                        high: Decimal.ToDouble(item.HighPrice),
+                        low: Decimal.ToDouble(item.LowPrice),
+                        close: Decimal.ToDouble(item.ClosePrice),
+                        timeStart: item.OpenTime,
+                        timeSpan: TimeSpan.FromMinutes(Interval),
+                        volume: Decimal.ToDouble(item.Volume)
+                    )).ToList();
 
 
-            //symbolModel.Algorithms.CalculateAlgorithmThree(symbolModel);
-            symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel);
-
+                //symbolModel.Algorithms.CalculateAlgorithmThree(symbolModel);
+                symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel);
+            }
         }
-        
+
         public List<IBinanceKline> Klines(string symbol, KlineInterval interval, int limit)
         {
             try

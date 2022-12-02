@@ -58,9 +58,9 @@
                 <TextBox Grid.Column="1" Text="{Binding Path=MainModel.Number}"/>
             </Grid>
             <TextBlock Grid.Column="2" Text="{Binding Path=MainModel.Plus,StringFormat=Plus: {0}}"/>
-            <TextBlock Grid.Column="3" Text="{Binding Path=MainModel.PlusPercent,StringFormat=PlusPercent: {0}}"/>
+            <TextBlock Grid.Column="3" Text="{Binding Path=MainModel.PlusPercent,StringFormat=Plus % {0}}"/>
             <TextBlock Grid.Column="4" Text="{Binding Path=MainModel.Minus,StringFormat=Minus: {0}}"/>
-            <TextBlock Grid.Column="5" Text="{Binding Path=MainModel.MinusPercent,StringFormat=MinusPercent: {0}}"/>
+            <TextBlock Grid.Column="5" Text="{Binding Path=MainModel.MinusPercent,StringFormat=Minus % {0}}"/>
             <TextBlock Grid.Column="6" Text="Loading" Style="{StaticResource styleTextBlockLoading}"/>
             <Button Grid.Column="7" Content="Save klines" Command="{Binding Path=SaveKlinesCommand}"/>
         </Grid>
@@ -70,9 +70,9 @@
                     <GridView>
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
                         <GridViewColumn Header="Plus" DisplayMemberBinding="{Binding Path=Plus}"/>
-                        <GridViewColumn Header="Plus %" DisplayMemberBinding="{Binding Path=PlusPercent}"/>
+                        <GridViewColumn Header="Plus %" DisplayMemberBinding="{Binding Path=PlusPercent, StringFormat=\{0:n2\}}"/>
                         <GridViewColumn Header="Minus" DisplayMemberBinding="{Binding Path=Minus}"/>
-                        <GridViewColumn Header="Minus %" DisplayMemberBinding="{Binding Path=MinusPercent}"/>
+                        <GridViewColumn Header="Minus %" DisplayMemberBinding="{Binding Path=MinusPercent, StringFormat=\{0:n2\}}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -87,8 +87,8 @@
                         <GridViewColumn Header="Win" DisplayMemberBinding="{Binding Path=Win}"/>
                         <GridViewColumn Header="Open" DisplayMemberBinding="{Binding Path=Open}"/>
                         <GridViewColumn Header="Close" DisplayMemberBinding="{Binding Path=Close}"/>
-                        <GridViewColumn Header="Plus %" DisplayMemberBinding="{Binding Path=PlusPercent}"/>
-                        <GridViewColumn Header="Minus %" DisplayMemberBinding="{Binding Path=MinusPercent}"/>
+                        <GridViewColumn Header="Plus %" DisplayMemberBinding="{Binding Path=PlusPercent, StringFormat=\{0:n2\}}"/>
+                        <GridViewColumn Header="Minus %" DisplayMemberBinding="{Binding Path=MinusPercent, StringFormat=\{0:n2\}}"/>
                         <GridViewColumn Header="Plus" DisplayMemberBinding="{Binding Path=Plus}"/>
                         <GridViewColumn Header="Minus" DisplayMemberBinding="{Binding Path=Minus}"/>
                     </GridView>

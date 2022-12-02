@@ -339,9 +339,9 @@ namespace Project_06.ViewModels
                     volume: Decimal.ToDouble(item.Volume)
                 )).ToList();
 
-            //symbolModel.Algorithms.CalculateAlgorithmOne(symbolModel);
-            //symbolModel.Algorithms.CalculateAlgorithmTwo(symbolModel);
-            symbolModel.Algorithms.CalculateAlgorithmThree(symbolModel);
+
+            //symbolModel.Algorithms.CalculateAlgorithmThree(symbolModel);
+            symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel);
 
         }
         

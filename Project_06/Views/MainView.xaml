@@ -57,31 +57,17 @@
             <Button Grid.Column="7" Content="Save klines" Command="{Binding Path=SaveKlinesCommand}"/>
         </Grid>
         <Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="50"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Name"/>
-                <TextBlock Grid.Column="1" Text="Plus"/>
-                <TextBlock Grid.Column="2" Text="Plus %"/>
-                <TextBlock Grid.Column="3" Text="Minus"/>
-                <TextBlock Grid.Column="4" Text="Minus %"/>
-            </Grid>
-            <ListBox Grid.Row="1" ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <local:SymbolView/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <ListView ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Header="Plus" DisplayMemberBinding="{Binding Path=Plus}"/>
+                        <GridViewColumn Header="Plus %" DisplayMemberBinding="{Binding Path=PlusPercent}"/>
+                        <GridViewColumn Header="Minus" DisplayMemberBinding="{Binding Path=Minus}"/>
+                        <GridViewColumn Header="Minus %" DisplayMemberBinding="{Binding Path=MinusPercent}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </Grid>
         <WpfPlot Grid.Column="1" Grid.Row="1" Content="{Binding Path=MainModel.MyPlot}"/>
         <WpfPlot Grid.Column="1" Grid.Row="2" Content="{Binding Path=MainModel.MyPlotLine}"/>

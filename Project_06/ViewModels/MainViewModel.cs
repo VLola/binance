@@ -28,6 +28,7 @@ namespace Project_06.ViewModels
         
         public FinancePlot financePlot { get; set; }
         public ScatterPlot scatterPlot { get; set; }
+        public ScatterPlot scatterPlotClose { get; set; }
 
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         private string _pathKlines = $"{Directory.GetCurrentDirectory()}/klines/";
@@ -134,10 +135,12 @@ namespace Project_06.ViewModels
 
                     MainModel.MyPlot.Plot.Remove(financePlot);
                     MainModel.MyPlot.Plot.Remove(scatterPlot);
+                    MainModel.MyPlot.Plot.Remove(scatterPlotClose);
                     financePlot = MainModel.MyPlot.Plot.AddCandlesticks(MainModel.SelectedSymbol.oHLCs.ToArray());
                     if (algorithmModel.x.Count > 0)
                     {
-                        scatterPlot = MainModel.MyPlot.Plot.AddScatter(algorithmModel.x.ToArray(), algorithmModel.y.ToArray(), lineWidth: 0);
+                        scatterPlot = MainModel.MyPlot.Plot.AddScatter(algorithmModel.x.ToArray(), algorithmModel.y.ToArray(), color: Color.Orange, lineWidth: 0, markerSize: 7);
+                        scatterPlotClose = MainModel.MyPlot.Plot.AddScatter(algorithmModel.xClose.ToArray(), algorithmModel.yClose.ToArray(), color: Color.SkyBlue, lineWidth: 0, markerSize: 7);
                     }
                     MainModel.MyPlot.Plot.RenderUnlock();
                     MainModel.MyPlot.Refresh();
@@ -385,7 +388,7 @@ namespace Project_06.ViewModels
             list.Sort();
             foreach (var it in list)
             {
-                if (it.Contains("USDT"))
+                if (it.Contains("USDT") && it != "FTTUSDT")
                 {
                     MainModel.SymbolsName.Add(it);
                     MainModel.Symbols.Add(new SymbolModel() { Name = it });

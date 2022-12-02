@@ -7,6 +7,8 @@ namespace Project_06.Models
     {
         public List<double> x = new();
         public List<double> y = new();
+        public List<double> xClose = new();
+        public List<double> yClose = new();
         public List<PointModel> Points = new();
         public int Plus = 0;
         public int Minus = 0;

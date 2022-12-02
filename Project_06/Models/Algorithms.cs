@@ -248,7 +248,98 @@ namespace Project_06.Models
 
         public void CalculateAlgorithmThree(SymbolModel symbolModel)
         {
+            for (int i = 2; i < 20; i++)
+            {
+                for (int j = 0; j < 30; j++)
+                {
+                    AlgorithmThree(symbolModel, i, j);
+                }
+            }
+        }
+        private void AlgorithmThree(SymbolModel symbolModel, int mul, int kline)
+        {
+            AlgorithmModel algorithmModel = new AlgorithmModel();
 
+            double indicator = 0;
+            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[0].DateTime.ToOADate());
+            algorithmModel.yIndicatorLong.Add(0);
+
+
+            for (int i = 0; i < symbolModel.oHLCs.Count - 3 - kline; i++)
+            {
+                if (i > 30)
+                {
+                    double sum = 0;
+                    for (int j = i; j > (i - 30); j--)
+                    {
+                        sum += (symbolModel.oHLCs[j].High - symbolModel.oHLCs[j].Low);
+                    }
+                    double average = (sum / 30);
+                    if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * mul))
+                    {
+                        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+
+                        if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 1].Open)
+                        {
+                            // Short
+                            if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 2 + kline].Close)
+                            {
+
+                                indicator += 1;
+                                algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.yIndicatorShort.Add(indicator);
+
+                                algorithmModel.Plus += 1;
+                                algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 10000);
+                                i = i + kline;
+                            }
+                            else
+                            {
+
+                                indicator -= 1;
+                                algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.yIndicatorShort.Add(indicator);
+
+                                algorithmModel.Minus += 1;
+                                algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
+                                i = i + kline;
+                            }
+                        }
+                        else
+                        {
+                            // Long
+                            if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 2 + kline].Close)
+                            {
+
+                                indicator += 1;
+                                algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.yIndicatorLong.Add(indicator);
+
+                                algorithmModel.Plus += 1;
+                                algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
+                                i = i + kline;
+                            }
+                            else
+                            {
+
+                                indicator -= 1;
+                                algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.yIndicatorLong.Add(indicator);
+
+                                algorithmModel.Minus += 1;
+                                algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 10000);
+                                i = i + kline;
+                            }
+                        }
+
+                    }
+                }
+            }
+            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[symbolModel.oHLCs.Count - 1].DateTime.ToOADate());
+            algorithmModel.yIndicatorLong.Add(0);
+
+            ListAlgorithms.Add(algorithmModel);
         }
     }
 }

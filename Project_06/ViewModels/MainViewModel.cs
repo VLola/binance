@@ -10,6 +10,7 @@ using ScottPlot;
 using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
@@ -162,6 +163,7 @@ namespace Project_06.ViewModels
         private void CalculateStatistics()
         {
             MainModel.Statistics.Clear();
+            List<StatisticsModel> list = new();
             for (int i = 0; i < MainModel.Symbols[0].Algorithms.ListAlgorithms.Count - 1; i++)
             {
                 int plus = 0;
@@ -187,10 +189,13 @@ namespace Project_06.ViewModels
                 statisticsModel.MinusPercent = minusPercent;
                 statisticsModel.Win = Math.Round(plusPercent / minusPercent, 2);
                 statisticsModel.Number = i;
-                MainModel.Statistics.Add(statisticsModel);
+                list.Add(statisticsModel);
             }
-            
-
+            var result = list.OrderByDescending(a => a.Win);
+            foreach (var item in result)
+            {
+                MainModel.Statistics.Add(item);
+            }
         }
         private async void SaveAllSymbol()
         {
@@ -284,8 +289,9 @@ namespace Project_06.ViewModels
                     volume: Decimal.ToDouble(item.Volume)
                 )).ToList();
 
-            symbolModel.Algorithms.CalculateAlgorithmOne(symbolModel);
-            symbolModel.Algorithms.CalculateAlgorithmTwo(symbolModel);
+            //symbolModel.Algorithms.CalculateAlgorithmOne(symbolModel);
+            //symbolModel.Algorithms.CalculateAlgorithmTwo(symbolModel);
+            symbolModel.Algorithms.CalculateAlgorithmThree(symbolModel);
 
         }
         

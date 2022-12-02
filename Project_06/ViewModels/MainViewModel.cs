@@ -19,6 +19,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace Project_06.ViewModels
 {
@@ -27,8 +28,7 @@ namespace Project_06.ViewModels
         
         public FinancePlot financePlot { get; set; }
         public ScatterPlot scatterPlot { get; set; }
-        public ScatterPlot scatterPlotIndicatorLong { get; set; }
-        public ScatterPlot scatterPlotIndicatorShort { get; set; }
+
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         private string _pathKlines = $"{Directory.GetCurrentDirectory()}/klines/";
         public MainModel MainModel { get; set; }
@@ -51,16 +51,6 @@ namespace Project_06.ViewModels
             {
                 return _saveKlinesCommand ?? (_saveKlinesCommand = new RelayCommand(obj => {
                     //SaveAllSymbol();
-                }));
-            }
-        }
-        private RelayCommand? _calculateStatisticsCommand;
-        public RelayCommand CalculateStatisticsCommand
-        {
-            get
-            {
-                return _calculateStatisticsCommand ?? (_calculateStatisticsCommand = new RelayCommand(obj => {
-                    CalculateStatistics();
                 }));
             }
         }
@@ -100,12 +90,17 @@ namespace Project_06.ViewModels
         {
             if (e.PropertyName == "SelectedSymbol")
             {
-                LoadChart();
+                LoadKlinesChart();
+            }
+            else if (e.PropertyName == "SelectedStatistics")
+            {
+                MainModel.Number = MainModel.SelectedStatistics.Number;
             }
             else if (e.PropertyName == "Number")
             {
                 LoadResults();
-                LoadChart();
+                LoadStrategyChart();
+                LoadKlinesChart();
             }
         }
         private void LoadResults()
@@ -128,41 +123,81 @@ namespace Project_06.ViewModels
                 MainModel.MinusPercent += symbolModel.MinusPercent;
             }
         }
-        private void LoadChart()
+        private void LoadKlinesChart()
         {
-            AlgorithmModel algorithmModel = MainModel.SelectedSymbol.Algorithms.ListAlgorithms[MainModel.Number];
-            MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
+            try
             {
-                MainModel.MyPlot.Plot.RenderLock();
-
-                MainModel.MyPlot.Plot.Remove(financePlot);
-                MainModel.MyPlot.Plot.Remove(scatterPlot);
-                financePlot = MainModel.MyPlot.Plot.AddCandlesticks(MainModel.SelectedSymbol.oHLCs.ToArray());
-                if (algorithmModel.x.Count > 0)
+                AlgorithmModel algorithmModel = MainModel.SelectedSymbol.Algorithms.ListAlgorithms[MainModel.Number];
+                MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
                 {
-                    scatterPlot = MainModel.MyPlot.Plot.AddScatter(algorithmModel.x.ToArray(), algorithmModel.y.ToArray(), lineWidth: 0);
-                }
-                MainModel.MyPlot.Plot.RenderUnlock();
-                MainModel.MyPlot.Refresh();
-            }));
+                    MainModel.MyPlot.Plot.RenderLock();
 
+                    MainModel.MyPlot.Plot.Remove(financePlot);
+                    MainModel.MyPlot.Plot.Remove(scatterPlot);
+                    financePlot = MainModel.MyPlot.Plot.AddCandlesticks(MainModel.SelectedSymbol.oHLCs.ToArray());
+                    if (algorithmModel.x.Count > 0)
+                    {
+                        scatterPlot = MainModel.MyPlot.Plot.AddScatter(algorithmModel.x.ToArray(), algorithmModel.y.ToArray(), lineWidth: 0);
+                    }
+                    MainModel.MyPlot.Plot.RenderUnlock();
+                    MainModel.MyPlot.Refresh();
+                }));
+            }
+            catch
+            {
+
+            }
+           
+
+        }
+        private void LoadStrategyChart()
+        {
+            List<PointModel> list = new();
+            foreach (var item in MainModel.Symbols)
+            {
+                list.AddRange(item.Algorithms.ListAlgorithms[MainModel.Number].Points);
+            }
+            list.Sort((x, y) => x.Time.CompareTo(y.Time));
             MainModel.MyPlotLine.Dispatcher.Invoke(new Action(() =>
             {
                 MainModel.MyPlotLine.Plot.RenderLock();
+                MainModel.MyPlotLine.Plot.Clear();
 
-                MainModel.MyPlotLine.Plot.Remove(scatterPlotIndicatorLong);
-                MainModel.MyPlotLine.Plot.Remove(scatterPlotIndicatorShort);
-                scatterPlotIndicatorLong = MainModel.MyPlotLine.Plot.AddScatter(algorithmModel.xIndicatorLong.ToArray(), algorithmModel.yIndicatorLong.ToArray(), color: Color.Green, lineWidth: 0);
+                MainModel.MyPlotLine.Plot.AddPoint(x: MainModel.SelectedSymbol.oHLCs[0].DateTime.ToOADate(), y: 0, color: Color.Orange);
+                MainModel.MyPlotLine.Plot.AddPoint(x: MainModel.SelectedSymbol.oHLCs[MainModel.SelectedSymbol.oHLCs.Count - 1].DateTime.ToOADate(), y: 0, color: Color.Orange);
 
-                scatterPlotIndicatorShort = MainModel.MyPlotLine.Plot.AddScatter(algorithmModel.xIndicatorShort.ToArray(), algorithmModel.yIndicatorShort.ToArray(), color: Color.Red, lineWidth: 0);
+                double i = 0;
+                foreach (var item in list)
+                {
+                    if(item.IsPositive)
+                    {
+                        i += item.Percent;
+                        Color color;
+                        if(item.IsLong) color = Color.Green;
+                        else color = Color.Red;
 
+                        MainModel.MyPlotLine.Plot.AddPoint(x: item.Time, y: i, color: color);
+                    }
+                    else
+                    {
+                        i -= item.Percent;
+                        Color color;
+                        if (item.IsLong) color = Color.Green;
+                        else color = Color.Red;
+
+                        MainModel.MyPlotLine.Plot.AddPoint(x: item.Time, y: i, color: color);
+                    }
+                }
                 MainModel.MyPlotLine.Plot.RenderUnlock();
                 MainModel.MyPlotLine.Refresh();
             }));
         }
         private void CalculateStatistics()
         {
-            MainModel.Statistics.Clear();
+            App.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                MainModel.Statistics.Clear();
+            }));
             List<StatisticsModel> list = new();
             for (int i = 0; i < MainModel.Symbols[0].Algorithms.ListAlgorithms.Count - 1; i++)
             {
@@ -170,6 +205,8 @@ namespace Project_06.ViewModels
                 int minus = 0;
                 double plusPercent = 0;
                 double minusPercent = 0;
+                int open = 0;
+                int close = 0;
                 foreach (var symbolModel in MainModel.Symbols)
                 {
                     symbolModel.Plus = symbolModel.Algorithms.ListAlgorithms[i].Plus;
@@ -177,6 +214,8 @@ namespace Project_06.ViewModels
                     symbolModel.PlusPercent = symbolModel.Algorithms.ListAlgorithms[i].PlusPercent;
                     symbolModel.MinusPercent = symbolModel.Algorithms.ListAlgorithms[i].MinusPercent;
 
+                    open = symbolModel.Algorithms.ListAlgorithms[i].Open;
+                    close = symbolModel.Algorithms.ListAlgorithms[i].Close;
                     plus += symbolModel.Plus;
                     plusPercent += symbolModel.PlusPercent;
                     minus += symbolModel.Minus;
@@ -189,13 +228,19 @@ namespace Project_06.ViewModels
                 statisticsModel.MinusPercent = minusPercent;
                 statisticsModel.Win = Math.Round(plusPercent / minusPercent, 2);
                 statisticsModel.Number = i;
+                statisticsModel.Open = open; 
+                statisticsModel.Close = close;
                 list.Add(statisticsModel);
             }
             var result = list.OrderByDescending(a => a.Win);
-            foreach (var item in result)
+
+            App.Current.Dispatcher.Invoke(new Action(() =>
             {
-                MainModel.Statistics.Add(item);
-            }
+                foreach (var item in result)
+                {
+                    MainModel.Statistics.Add(item);
+                }
+            }));
         }
         private async void SaveAllSymbol()
         {
@@ -248,14 +293,19 @@ namespace Project_06.ViewModels
         {
             await Task.Run(() =>
             {
+                List<Task> tasks = new();
                 foreach (var item in MainModel.Symbols)
                 {
-                    GetSymbol(item);
+                    Task task = GetSymbol(item);
+                    tasks.Add(task);
                 }
+                Task.WaitAll(tasks.ToArray()); 
+                MainModel.SelectedSymbol = MainModel.Symbols[32];
+                CalculateStatistics();
 
             });
         }
-        private async void GetSymbol(SymbolModel symbolModel)
+        private async Task GetSymbol(SymbolModel symbolModel)
         {
             await Task.Run(() =>
             {

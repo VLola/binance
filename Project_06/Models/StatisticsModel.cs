@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Project_06.Models
+﻿namespace Project_06.Models
 {
     public class StatisticsModel
     {
@@ -14,5 +8,7 @@ namespace Project_06.Models
         public int Minus { get; set; }
         public double MinusPercent { get; set; }
         public int Number { get; set; }
+        public int Open { get; set; }
+        public int Close { get; set; }
     }
 }

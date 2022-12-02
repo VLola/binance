@@ -12,10 +12,6 @@ namespace Project_06.Models
             AlgorithmModel algorithmModel = new AlgorithmModel();
             int mul = 4;
 
-            double indicator = 0;
-            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[0].DateTime.ToOADate());
-            algorithmModel.yIndicatorLong.Add(0);
-
             bool reverse = false;
             bool minus = false;
 
@@ -44,9 +40,6 @@ namespace Project_06.Models
                                 {
                                     minus = false;
 
-                                    indicator += 1;
-                                    algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorShort.Add(indicator);
 
                                     algorithmModel.Plus += 1;
                                     algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2].Close) / symbolModel.oHLCs[i + 2].Close * 10000);
@@ -60,9 +53,6 @@ namespace Project_06.Models
                                     }
                                     minus = true;
 
-                                    indicator -= 1;
-                                    algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorShort.Add(indicator);
 
                                     algorithmModel.Minus += 1;
                                     algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 2].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
@@ -75,9 +65,6 @@ namespace Project_06.Models
                                 {
                                     minus = false;
 
-                                    indicator += 1;
-                                    algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorLong.Add(indicator);
 
                                     algorithmModel.Plus += 1;
                                     algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 2].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
@@ -91,9 +78,6 @@ namespace Project_06.Models
                                     }
                                     minus = true;
 
-                                    indicator -= 1;
-                                    algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorLong.Add(indicator);
 
                                     algorithmModel.Minus += 1;
                                     algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2].Close) / symbolModel.oHLCs[i + 2].Close * 10000);
@@ -107,18 +91,12 @@ namespace Project_06.Models
                                 // Short
                                 if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 2].Close)
                                 {
-                                    indicator += 1;
-                                    algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorShort.Add(indicator);
 
                                     symbolModel.Plus += 1;
                                     symbolModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2].Close) / symbolModel.oHLCs[i + 2].Close * 10000);
                                 }
                                 else
                                 {
-                                    indicator -= 1;
-                                    algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorShort.Add(indicator);
 
                                     algorithmModel.Minus += 1;
                                     algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 2].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
@@ -129,18 +107,12 @@ namespace Project_06.Models
                                 // Long
                                 if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 2].Close)
                                 {
-                                    indicator += 1;
-                                    algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorLong.Add(indicator);
 
                                     algorithmModel.Plus += 1;
                                     algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 2].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
                                 }
                                 else
                                 {
-                                    indicator -= 1;
-                                    algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                    algorithmModel.yIndicatorLong.Add(indicator);
 
                                     algorithmModel.Minus += 1;
                                     algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2].Close) / symbolModel.oHLCs[i + 2].Close * 10000);
@@ -151,8 +123,7 @@ namespace Project_06.Models
                     }
                 }
             }
-            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[symbolModel.oHLCs.Count - 1].DateTime.ToOADate());
-            algorithmModel.yIndicatorLong.Add(0);
+
             ListAlgorithms.Add(algorithmModel);
         }
         public void CalculateAlgorithmTwo(SymbolModel symbolModel)
@@ -167,10 +138,6 @@ namespace Project_06.Models
         private void AlgorithmTwo(SymbolModel symbolModel, int mul)
         {
             AlgorithmModel algorithmModel = new AlgorithmModel();
-
-            double indicator = 0;
-            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[0].DateTime.ToOADate());
-            algorithmModel.yIndicatorLong.Add(0);
 
 
             for (int i = 0; i < symbolModel.oHLCs.Count - 3; i++)
@@ -194,9 +161,6 @@ namespace Project_06.Models
                             if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 2].Close)
                             {
 
-                                indicator += 1;
-                                algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorShort.Add(indicator);
 
                                 algorithmModel.Plus += 1;
                                 algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2].Close) / symbolModel.oHLCs[i + 2].Close * 10000);
@@ -204,9 +168,6 @@ namespace Project_06.Models
                             else
                             {
 
-                                indicator -= 1;
-                                algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorShort.Add(indicator);
 
                                 algorithmModel.Minus += 1;
                                 algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 2].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
@@ -218,9 +179,6 @@ namespace Project_06.Models
                             if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 2].Close)
                             {
 
-                                indicator += 1;
-                                algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorLong.Add(indicator);
 
                                 algorithmModel.Plus += 1;
                                 algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 2].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
@@ -228,9 +186,6 @@ namespace Project_06.Models
                             else
                             {
 
-                                indicator -= 1;
-                                algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorLong.Add(indicator);
 
                                 algorithmModel.Minus += 1;
                                 algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2].Close) / symbolModel.oHLCs[i + 2].Close * 10000);
@@ -240,8 +195,6 @@ namespace Project_06.Models
                     }
                 }
             }
-            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[symbolModel.oHLCs.Count - 1].DateTime.ToOADate());
-            algorithmModel.yIndicatorLong.Add(0);
 
             ListAlgorithms.Add(algorithmModel);
         }
@@ -260,10 +213,8 @@ namespace Project_06.Models
         {
             AlgorithmModel algorithmModel = new AlgorithmModel();
 
-            double indicator = 0;
-            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[0].DateTime.ToOADate());
-            algorithmModel.yIndicatorLong.Add(0);
-
+            algorithmModel.Open = mul;
+            algorithmModel.Close = kline;
 
             for (int i = 0; i < symbolModel.oHLCs.Count - 3 - kline; i++)
             {
@@ -277,32 +228,44 @@ namespace Project_06.Models
                     double average = (sum / 30);
                     if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * mul))
                     {
-                        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
 
-                        if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 1].Open)
+                        if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 1].Open)
                         {
                             // Short
                             if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 2 + kline].Close)
                             {
+                                algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
 
-                                indicator += 1;
-                                algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorShort.Add(indicator);
+                                double percent = Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 10000);
+
+                                PointModel pointModel = new();
+                                pointModel.IsPositive = true;
+                                pointModel.IsLong = false;
+                                pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                                pointModel.Percent = percent;
+                                algorithmModel.Points.Add(pointModel);
 
                                 algorithmModel.Plus += 1;
-                                algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 10000);
+                                algorithmModel.PlusPercent += percent;
                                 i = i + kline;
                             }
                             else
                             {
+                                algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
 
-                                indicator -= 1;
-                                algorithmModel.xIndicatorShort.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorShort.Add(indicator);
+                                double percent = Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
+
+                                PointModel pointModel = new();
+                                pointModel.IsPositive = false;
+                                pointModel.IsLong = false;
+                                pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                                pointModel.Percent = percent;
+                                algorithmModel.Points.Add(pointModel);
 
                                 algorithmModel.Minus += 1;
-                                algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
+                                algorithmModel.MinusPercent += percent;
                                 i = i + kline;
                             }
                         }
@@ -311,24 +274,38 @@ namespace Project_06.Models
                             // Long
                             if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 2 + kline].Close)
                             {
+                                //algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                //algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
 
-                                indicator += 1;
-                                algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorLong.Add(indicator);
+                                //double percent = Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
 
-                                algorithmModel.Plus += 1;
-                                algorithmModel.PlusPercent += Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 10000);
+                                //PointModel pointModel = new();
+                                //pointModel.IsPositive = true;
+                                //pointModel.IsLong = true;
+                                //pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                                //pointModel.Percent = percent;
+                                //algorithmModel.Points.Add(pointModel);
+
+                                //algorithmModel.Plus += 1;
+                                //algorithmModel.PlusPercent += percent;
                                 i = i + kline;
                             }
                             else
                             {
+                                //algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                //algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
 
-                                indicator -= 1;
-                                algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.yIndicatorLong.Add(indicator);
+                                //double percent = Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 10000);
 
-                                algorithmModel.Minus += 1;
-                                algorithmModel.MinusPercent += Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 10000);
+                                //PointModel pointModel = new();
+                                //pointModel.IsPositive = false;
+                                //pointModel.IsLong = true;
+                                //pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                                //pointModel.Percent = percent;
+                                //algorithmModel.Points.Add(pointModel);
+
+                                //algorithmModel.Minus += 1;
+                                //algorithmModel.MinusPercent += percent;
                                 i = i + kline;
                             }
                         }
@@ -336,8 +313,6 @@ namespace Project_06.Models
                     }
                 }
             }
-            algorithmModel.xIndicatorLong.Add(symbolModel.oHLCs[symbolModel.oHLCs.Count - 1].DateTime.ToOADate());
-            algorithmModel.yIndicatorLong.Add(0);
 
             ListAlgorithms.Add(algorithmModel);
         }

@@ -32,6 +32,16 @@ namespace Project_06.Models
                 OnPropertyChanged("SelectedSymbol");
             }
         }
+        private StatisticsModel _selectedStatistics { get; set; }
+        public StatisticsModel SelectedStatistics
+        {
+            get { return _selectedStatistics; }
+            set
+            {
+                _selectedStatistics = value;
+                OnPropertyChanged("SelectedStatistics");
+            }
+        }
         private bool _isLoading { get; set; }
         public bool IsLoading
         {

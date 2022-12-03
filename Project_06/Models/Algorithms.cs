@@ -318,7 +318,7 @@ namespace Project_06.Models
             ListAlgorithms.Add(algorithmModel);
         }
 
-        double StopLoss = 0.5;
+        double StopLoss = 1;
         public void CalculateAlgorithmFour(SymbolModel symbolModel)
         {
             for (int i = 2; i < 20; i++)

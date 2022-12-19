@@ -2,6 +2,7 @@
 using Binance.Net.Enums;
 using Binance.Net.Interfaces;
 using Binance.Net.Objects.Models.Spot;
+using CryptoExchange.Net;
 using CryptoExchange.Net.CommonObjects;
 using Newtonsoft.Json;
 using Project_06.Command;
@@ -20,6 +21,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Shapes;
 
 namespace Project_06.ViewModels
 {
@@ -59,7 +61,9 @@ namespace Project_06.ViewModels
         {
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
             if (!Directory.Exists(_pathKlines)) Directory.CreateDirectory(_pathKlines);
+            //----------------------------------------------------------------------------------------------------------Commit
             _client = new();
+
             MainModel = new();
             MainModel.PropertyChanged += MainModel_PropertyChanged;
             MainModel.MyPlot.Dispatcher.Invoke(new Action(() =>
@@ -146,6 +150,9 @@ namespace Project_06.ViewModels
                     if (algorithmModel.x.Count > 0)
                     {
                         scatterPlot = MainModel.MyPlot.Plot.AddScatter(algorithmModel.x.ToArray(), algorithmModel.y.ToArray(), color: Color.Orange, lineWidth: 0, markerSize: 7);
+                    }
+                    if (algorithmModel.xClose.Count > 0)
+                    {
                         scatterPlotClose = MainModel.MyPlot.Plot.AddScatter(algorithmModel.xClose.ToArray(), algorithmModel.yClose.ToArray(), color: Color.SkyBlue, lineWidth: 0, markerSize: 7);
                     }
                     MainModel.MyPlot.Plot.RenderUnlock();
@@ -262,7 +269,7 @@ namespace Project_06.ViewModels
 
             });
         }
-        int Interval = 5;
+        int Interval = 1;
         int Size = 110;
         private async void SaveSymbol(string symbol, DateTime dateTime)
         {
@@ -340,9 +347,9 @@ namespace Project_06.ViewModels
         }
         private void StartNewAlgo(SymbolModel symbolModel)
         {
-            string json = File.ReadAllText(_pathKlines + symbolModel.Name);
-            List<BinanceSpotKline>? binanceKlines = JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json);
-            //List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.OneMinute, 400);
+            //string json = File.ReadAllText(_pathKlines + symbolModel.Name);
+            //List<BinanceSpotKline>? binanceKlines = JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json);
+            List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.FiveMinutes, 400);
 
             if (binanceKlines != null)
             {
@@ -356,8 +363,9 @@ namespace Project_06.ViewModels
                         volume: Decimal.ToDouble(item.Volume)
                     )).ToList();
 
-
+                // без стоп лосс
                 //symbolModel.Algorithms.CalculateAlgorithmThree(symbolModel);
+                // с стоп лосс
                 symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel);
             }
         }
@@ -413,6 +421,8 @@ namespace Project_06.ViewModels
         {
             try
             {
+                //---------------------------------------------------------------------------------------------------------------Delete
+                //return (from a in Directory.GetFiles(_pathKlines) select System.IO.Path.GetFileNameWithoutExtension(a)).ToList();
                 var result = _client.UsdFuturesApi.ExchangeData.GetPricesAsync().Result;
                 if (!result.Success) WriteLog($"Failed Success ListSymbols: {result.Error?.Message}");
                 return result.Data.Select(item => item.Symbol).ToList();

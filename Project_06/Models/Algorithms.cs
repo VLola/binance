@@ -210,6 +210,7 @@ namespace Project_06.Models
                 }
             }
         }
+        // Алгоритм без стоп лосса
         private void AlgorithmThree(SymbolModel symbolModel, int mul, int kline)
         {
             AlgorithmModel algorithmModel = new AlgorithmModel();
@@ -270,46 +271,46 @@ namespace Project_06.Models
                                 i = i + kline;
                             }
                         }
-                        else
-                        {
-                            // Long
-                            if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 2 + kline].Close)
-                            {
-                                //algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                //algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+                        //else
+                        //{
+                        //    // Long
+                        //    if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 2 + kline].Close)
+                        //    {
+                        //        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                        //        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
 
-                                //double percent = Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 100, 2);
+                        //        double percent = Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 100, 2);
 
-                                //PointModel pointModel = new();
-                                //pointModel.IsPositive = true;
-                                //pointModel.IsLong = true;
-                                //pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
-                                //pointModel.Percent = percent;
-                                //algorithmModel.Points.Add(pointModel);
+                        //        PointModel pointModel = new();
+                        //        pointModel.IsPositive = true;
+                        //        pointModel.IsLong = true;
+                        //        pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                        //        pointModel.Percent = percent;
+                        //        algorithmModel.Points.Add(pointModel);
 
-                                //algorithmModel.Plus += 1;
-                                //algorithmModel.PlusPercent += percent;
-                                i = i + kline;
-                            }
-                            else
-                            {
-                                //algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                //algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+                        //        algorithmModel.Plus += 1;
+                        //        algorithmModel.PlusPercent += percent;
+                        //        i = i + kline;
+                        //    }
+                        //    else
+                        //    {
+                        //        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                        //        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
 
-                                //double percent = Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 100, 2);
+                        //        double percent = Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 100, 2);
 
-                                //PointModel pointModel = new();
-                                //pointModel.IsPositive = false;
-                                //pointModel.IsLong = true;
-                                //pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
-                                //pointModel.Percent = percent;
-                                //algorithmModel.Points.Add(pointModel);
+                        //        PointModel pointModel = new();
+                        //        pointModel.IsPositive = false;
+                        //        pointModel.IsLong = true;
+                        //        pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                        //        pointModel.Percent = percent;
+                        //        algorithmModel.Points.Add(pointModel);
 
-                                //algorithmModel.Minus += 1;
-                                //algorithmModel.MinusPercent += percent;
-                                i = i + kline;
-                            }
-                        }
+                        //        algorithmModel.Minus += 1;
+                        //        algorithmModel.MinusPercent += percent;
+                        //        i = i + kline;
+                        //    }
+                        //}
 
                     }
                 }
@@ -317,8 +318,8 @@ namespace Project_06.Models
 
             ListAlgorithms.Add(algorithmModel);
         }
-
-        double StopLoss = 1;
+        /// Алгоритм с стоп лосом
+        double StopLoss = 0.05;
         public void CalculateAlgorithmFour(SymbolModel symbolModel)
         {
             for (int i = 2; i < 20; i++)
@@ -346,9 +347,15 @@ namespace Project_06.Models
                         sum += (symbolModel.oHLCs[j].High - symbolModel.oHLCs[j].Low);
                     }
                     double average = (sum / 30);
+                    //Добавлена ещё 1 проверка
+                    
                     if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * mul))
                     {
-
+                        //if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * (mul + 1)))
+                        //{
+                        //    i = i + kline;
+                        //    continue;
+                        //}
                         if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 1].Open)
                         {
                             // Short
@@ -446,7 +453,7 @@ namespace Project_06.Models
         {
             for (int i = (start + 1); i <= end; i++)
             {
-                if ((symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100))) < symbolModel.oHLCs[i].High)
+                if ((symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100))) <= symbolModel.oHLCs[i].High)
                 {
                     algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                     algorithmModel.yClose.Add(symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100)));
@@ -459,7 +466,7 @@ namespace Project_06.Models
         {
             for (int i = (start + 1); i <= end; i++)
             {
-                if ((symbolModel.oHLCs[start].Close - (symbolModel.oHLCs[start].Close * (StopLoss / 100))) > symbolModel.oHLCs[i].Low)
+                if ((symbolModel.oHLCs[start].Close - (symbolModel.oHLCs[start].Close * (StopLoss / 100))) >= symbolModel.oHLCs[i].Low)
                 {
                     algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                     algorithmModel.yClose.Add(symbolModel.oHLCs[start].Close - (symbolModel.oHLCs[start].Close * (StopLoss / 100)));

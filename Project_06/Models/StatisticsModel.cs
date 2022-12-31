@@ -10,5 +10,6 @@
         public int Number { get; set; }
         public int Open { get; set; }
         public int Close { get; set; }
+        public double Profit { get; set; }
     }
 }

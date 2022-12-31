@@ -319,7 +319,7 @@ namespace Project_06.Models
             ListAlgorithms.Add(algorithmModel);
         }
         /// Алгоритм с стоп лосом
-        double StopLoss = 1;
+        double StopLoss = 2;
         public void CalculateAlgorithmFour(SymbolModel symbolModel)
         {
             for (int i = 2; i < 20; i++)

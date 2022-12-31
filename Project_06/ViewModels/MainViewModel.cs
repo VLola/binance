@@ -246,6 +246,11 @@ namespace Project_06.ViewModels
                 statisticsModel.Number = i;
                 statisticsModel.Open = open; 
                 statisticsModel.Close = close;
+
+                double commision = (statisticsModel.Plus + statisticsModel.Minus) * 0.08;
+                double profit = statisticsModel.PlusPercent - statisticsModel.MinusPercent;
+                statisticsModel.Profit = Math.Round(profit - commision, 2);
+
                 list.Add(statisticsModel);
             }
             var result = list.OrderByDescending(a => a.Win);
@@ -269,8 +274,8 @@ namespace Project_06.ViewModels
 
             });
         }
-        int Interval = 5;
-        int Size = 110;
+        int Interval = 15;
+        int Size = 30;
         private async void SaveSymbol(string symbol, DateTime dateTime)
         {
             try
@@ -278,8 +283,9 @@ namespace Project_06.ViewModels
                 await Task.Run(async () =>
                 {
                     KlineInterval klineInterval = KlineInterval.OneMinute;
-                    if(Interval == 5) klineInterval = KlineInterval.FiveMinutes;
-                    else if(Interval == 15) klineInterval = KlineInterval.FifteenMinutes;
+                    if (Interval == 5) klineInterval = KlineInterval.FiveMinutes;
+                    else if (Interval == 3) klineInterval = KlineInterval.ThreeMinutes;
+                    else if (Interval == 15) klineInterval = KlineInterval.FifteenMinutes;
 
                     List<IBinanceKline> binanceKlines = new();
                     for (int i = 0; i < Size; i++)
@@ -347,9 +353,9 @@ namespace Project_06.ViewModels
         }
         private void StartNewAlgo(SymbolModel symbolModel)
         {
-            //string json = File.ReadAllText(_pathKlines + symbolModel.Name);
-            //List<BinanceSpotKline>? binanceKlines = JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json);
-            List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.FiveMinutes, 400);
+            string json = File.ReadAllText(_pathKlines + symbolModel.Name);
+            List<BinanceSpotKline>? binanceKlines = JsonConvert.DeserializeObject<List<BinanceSpotKline>>(json);
+            //List<IBinanceKline> binanceKlines = Klines(symbolModel.Name, KlineInterval.FiveMinutes, 400);
 
             if (binanceKlines != null)
             {
@@ -427,7 +433,7 @@ namespace Project_06.ViewModels
             try
             {
                 //---------------------------------------------------------------------------------------------------------------Delete
-                //return (from a in Directory.GetFiles(_pathKlines) select System.IO.Path.GetFileNameWithoutExtension(a)).ToList();
+                return (from a in Directory.GetFiles(_pathKlines) select System.IO.Path.GetFileNameWithoutExtension(a)).ToList();
                 var result = _client.UsdFuturesApi.ExchangeData.GetPricesAsync().Result;
                 if (!result.Success) WriteLog($"Failed Success ListSymbols: {result.Error?.Message}");
                 return result.Data.Select(item => item.Symbol).ToList();

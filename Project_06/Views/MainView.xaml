@@ -91,6 +91,7 @@
                         <GridViewColumn Header="Minus %" DisplayMemberBinding="{Binding Path=MinusPercent, StringFormat=\{0:n2\}}"/>
                         <GridViewColumn Header="Plus" DisplayMemberBinding="{Binding Path=Plus}"/>
                         <GridViewColumn Header="Minus" DisplayMemberBinding="{Binding Path=Minus}"/>
+                        <GridViewColumn Header="Profit" DisplayMemberBinding="{Binding Path=Profit}"/>
                     </GridView>
                 </ListView.View>
             </ListView>

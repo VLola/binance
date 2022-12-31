@@ -1,6 +1,7 @@
 ﻿using CryptoExchange.Net.CommonObjects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Documents;
 
 namespace Project_06.Models
@@ -598,5 +599,149 @@ namespace Project_06.Models
 
             ListAlgorithms.Add(algorithmModel);
         }
+
+        public void CalculateAlgorithmSix(SymbolModel symbolModel)
+        {
+            AlgorithmSix(symbolModel);
+        }
+        private void AlgorithmSix(SymbolModel symbolModel)
+        {
+            AlgorithmModel algorithmModel = new AlgorithmModel();
+
+            int i = 0;
+
+            while (true)
+            {
+                i = Six(i, symbolModel, algorithmModel);
+                if (i == -1) break;
+                i++;
+            }
+
+
+
+            //for (int i = 0; i < symbolModel.oHLCs.Count - 1; i++)
+            //{
+            //    i = Six(i, symbolModel, algorithmModel);
+            //}
+
+            ListAlgorithms.Add(algorithmModel);
+        }
+        private int Six(int i, SymbolModel symbolModel, AlgorithmModel algorithmModel)
+        {
+            double open = symbolModel.oHLCs[i].Open;
+            List<double> sum = new List<double>();
+            sum.Add(open);
+            algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+            algorithmModel.y.Add(open);
+            int k = 1;
+            if (true)
+            {
+                // Short
+                for (; i < symbolModel.oHLCs.Count - 1; i++)
+                {
+                    if (k >= 30)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(open + (open / 100 * 1));
+
+                        algorithmModel.MinusPercent += (30 * 50 / 100 * 16);
+                        algorithmModel.Minus += 1;
+                        return i;
+                    }
+
+                    double average = sum.Sum() / sum.Count;
+
+                    if(symbolModel.oHLCs[i].High > open + (open / 100 * 1))
+                    {
+                        while (true)
+                        {
+                            if(symbolModel.oHLCs[i].High > open + (open / 100 * 1))
+                            {
+                                k++;
+                                open = open + (open / 100 * 1);
+                                sum.Add(open);
+                                algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                                algorithmModel.y.Add(open);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else if (symbolModel.oHLCs[i].Low < average - (average / 100 * 1))
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(average - (average / 100 * 1));
+
+                        algorithmModel.PlusPercent += ((double)k * 50 / 100);
+                        algorithmModel.Plus += 1;
+                        return i;
+                    }
+
+                }
+
+            }
+            else
+            {
+                // Long
+                for (; i < symbolModel.oHLCs.Count - 1; i++)
+                {
+                    if (k >= 30)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(open - (open / 100 * 1));
+
+                        algorithmModel.MinusPercent += (30 * 50 / 100 * 16);
+                        algorithmModel.Minus += 1;
+                        return i;
+                    }
+
+                    double average = sum.Sum() / sum.Count;
+
+                    if (symbolModel.oHLCs[i].Low < open - (open / 100 * 1))
+                    {
+                        while (true)
+                        {
+                            if (symbolModel.oHLCs[i].Low < open - (open / 100 * 1))
+                            {
+                                k++;
+                                open = open - (open / 100 * 1);
+                                sum.Add(open);
+                                algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                                algorithmModel.y.Add(open);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else if (symbolModel.oHLCs[i].High > average + (average / 100 * 1))
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(average + (average / 100 * 1));
+
+                        algorithmModel.PlusPercent += ((double)k * 50 / 100);
+                        algorithmModel.Plus += 1;
+                        return i;
+                    }
+
+                }
+            }
+            return -1;
+        }
+        private bool RandomPosition()
+        {
+            if(new Random().Next(0, 1) == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

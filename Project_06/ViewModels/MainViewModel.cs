@@ -275,7 +275,7 @@ namespace Project_06.ViewModels
             });
         }
         int Interval = 1;
-        int Size = 30;
+        int Size = 540;
         private async void SaveSymbol(string symbol, DateTime dateTime)
         {
             try

@@ -379,6 +379,7 @@ namespace Project_06.ViewModels
                 //symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel);
 
                 symbolModel.Algorithms.CalculateAlgorithmSix(symbolModel);
+                //symbolModel.Algorithms.CalculateAlgorithmSeven(symbolModel);
 
             }
         }

@@ -634,28 +634,28 @@ namespace Project_06.Models
             algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
             algorithmModel.y.Add(open);
             int k = 1;
-            if (true)
+            if (false)
             {
                 // Short
                 for (; i < symbolModel.oHLCs.Count - 1; i++)
                 {
-                    if (k >= 6)
+                    if (k >= 30)
                     {
                         algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                         algorithmModel.yClose.Add(open + (open / 100 * 1));
 
-                        algorithmModel.MinusPercent += (6 * 50 / 100 * 4);
+                        algorithmModel.MinusPercent += (30 * 50 / 100 * 16);
                         algorithmModel.Minus += 1;
                         return i;
                     }
 
                     double average = sum.Sum() / sum.Count;
 
-                    if(symbolModel.oHLCs[i].High > open + (open / 100 * 1))
+                    if(symbolModel.oHLCs[i].High > (open + (open / 100 * 1)))
                     {
                         while (true)
                         {
-                            if(symbolModel.oHLCs[i].High > open + (open / 100 * 1))
+                            if(symbolModel.oHLCs[i].High > (open + (open / 100 * 1)))
                             {
                                 k++;
                                 open = open + (open / 100 * 1);
@@ -669,7 +669,7 @@ namespace Project_06.Models
                             }
                         }
                     }
-                    else if (symbolModel.oHLCs[i].Low < average - (average / 100 * 1))
+                    else if (symbolModel.oHLCs[i].Low < (average - (average / 100 * 1)))
                     {
                         algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                         algorithmModel.yClose.Add(average - (average / 100 * 1));
@@ -687,23 +687,23 @@ namespace Project_06.Models
                 // Long
                 for (; i < symbolModel.oHLCs.Count - 1; i++)
                 {
-                    if (k >= 6)
+                    if (k >= 30)
                     {
                         algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                         algorithmModel.yClose.Add(open - (open / 100 * 1));
 
-                        algorithmModel.MinusPercent += (6 * 50 / 100 * 4);
+                        algorithmModel.MinusPercent += (30 * 50 / 100 * 16);
                         algorithmModel.Minus += 1;
                         return i;
                     }
 
                     double average = sum.Sum() / sum.Count;
 
-                    if (symbolModel.oHLCs[i].Low < open - (open / 100 * 1))
+                    if (symbolModel.oHLCs[i].Low < (open - (open / 100 * 1)))
                     {
                         while (true)
                         {
-                            if (symbolModel.oHLCs[i].Low < open - (open / 100 * 1))
+                            if (symbolModel.oHLCs[i].Low < (open - (open / 100 * 1)))
                             {
                                 k++;
                                 open = open - (open / 100 * 1);
@@ -717,7 +717,7 @@ namespace Project_06.Models
                             }
                         }
                     }
-                    else if (symbolModel.oHLCs[i].High > average + (average / 100 * 1))
+                    else if (symbolModel.oHLCs[i].High > (average + (average / 100 * 1)))
                     {
                         algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                         algorithmModel.yClose.Add(average + (average / 100 * 1));

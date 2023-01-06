@@ -6,16 +6,47 @@
              xmlns:local="clr-namespace:Project_07.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <Grid>
             <ListView ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=SymbolModel.Name}"/>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=SymbolModel.Name}" Width="150"/>
+                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Path=SymbolModel.Price}" Width="100"/>
+                        <GridViewColumn Header="Total" DisplayMemberBinding="{Binding Path=SymbolModel.Total}" Width="70"/>
+                        <GridViewColumn Header="ShortPlus" DisplayMemberBinding="{Binding Path=SymbolModel.ShortPlus}" Width="70"/>
+                        <GridViewColumn Header="ShortMinus" DisplayMemberBinding="{Binding Path=SymbolModel.ShortMinus}" Width="70"/>
+                        <GridViewColumn Header="LongPlus" DisplayMemberBinding="{Binding Path=SymbolModel.LongPlus}" Width="70"/>
+                        <GridViewColumn Header="LongMinus" DisplayMemberBinding="{Binding Path=SymbolModel.LongMinus}" Width="70"/>
                     </GridView>
                 </ListView.View>
             </ListView>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Show sum" Grid.Column="0" Command="{Binding Path=ShowSumCommand}"/>
+            <TextBlock Grid.Column="1" Text="{Binding Path=MainModel.Total,StringFormat=Total: {0}}"/>
+            <TextBlock Grid.Column="2" Text="{Binding Path=MainModel.ShortPlus,StringFormat=ShortPlus: {0}}"/>
+            <TextBlock Grid.Column="3" Text="{Binding Path=MainModel.ShortMinus,StringFormat=ShortMinus: {0}}"/>
+            <TextBlock Grid.Column="4" Text="{Binding Path=MainModel.LongPlus,StringFormat=LongPlus: {0}}"/>
+            <TextBlock Grid.Column="5" Text="{Binding Path=MainModel.LongMinus,StringFormat=LongMinus: {0}}"/>
         </Grid>
     </Grid>
 </UserControl>

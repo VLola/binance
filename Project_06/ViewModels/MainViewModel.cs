@@ -378,8 +378,11 @@ namespace Project_06.ViewModels
                 // с стоп лосс в сторону выстрела
                 //symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel);
 
-                symbolModel.Algorithms.CalculateAlgorithmSix(symbolModel);
+                //symbolModel.Algorithms.CalculateAlgorithmSix(symbolModel);
                 //symbolModel.Algorithms.CalculateAlgorithmSeven(symbolModel);
+
+                //symbolModel.Algorithms.CalculateAlgorithmEight(symbolModel);
+                symbolModel.Algorithms.CalculateAlgorithmNine(symbolModel);
 
             }
         }

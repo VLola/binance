@@ -634,20 +634,11 @@ namespace Project_06.Models
             algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
             algorithmModel.y.Add(open);
             int k = 1;
-            if (false)
+            if (true)
             {
                 // Short
                 for (; i < symbolModel.oHLCs.Count - 1; i++)
                 {
-                    if (k >= 30)
-                    {
-                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
-                        algorithmModel.yClose.Add(open + (open / 100 * 1));
-
-                        algorithmModel.MinusPercent += (30 * 50 / 100 * 16);
-                        algorithmModel.Minus += 1;
-                        return i;
-                    }
 
                     double average = sum.Sum() / sum.Count;
 
@@ -658,6 +649,18 @@ namespace Project_06.Models
                             if(symbolModel.oHLCs[i].High > (open + (open / 100 * 1)))
                             {
                                 k++;
+                                // Закрытие стратегии в убыток
+                                if (k == 6)
+                                {
+                                    algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                                    algorithmModel.yClose.Add(open + (open / 100 * 1));
+
+                                    //algorithmModel.MinusPercent += (5 * 50 / 100 * 3);
+                                    algorithmModel.MinusPercent += 7.5;
+                                    algorithmModel.Minus += 1;
+                                    return i;
+                                }
+
                                 open = open + (open / 100 * 1);
                                 sum.Add(open);
                                 algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
@@ -674,7 +677,12 @@ namespace Project_06.Models
                         algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                         algorithmModel.yClose.Add(average - (average / 100 * 1));
 
-                        algorithmModel.PlusPercent += ((double)k * 50 / 100);
+                        if(k == 1) algorithmModel.PlusPercent += 0.5;
+                        else if(k == 2) algorithmModel.PlusPercent += 1;
+                        else if(k == 3) algorithmModel.PlusPercent += 1.5;
+                        else if(k == 4) algorithmModel.PlusPercent += 2;
+                        else if(k == 5) algorithmModel.PlusPercent += 2.5;
+
                         algorithmModel.Plus += 1;
                         return i;
                     }
@@ -687,15 +695,7 @@ namespace Project_06.Models
                 // Long
                 for (; i < symbolModel.oHLCs.Count - 1; i++)
                 {
-                    if (k >= 30)
-                    {
-                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
-                        algorithmModel.yClose.Add(open - (open / 100 * 1));
-
-                        algorithmModel.MinusPercent += (30 * 50 / 100 * 16);
-                        algorithmModel.Minus += 1;
-                        return i;
-                    }
+                    
 
                     double average = sum.Sum() / sum.Count;
 
@@ -706,6 +706,18 @@ namespace Project_06.Models
                             if (symbolModel.oHLCs[i].Low < (open - (open / 100 * 1)))
                             {
                                 k++;
+                                // Закрытие стратегии в убыток
+                                if (k == 6)
+                                {
+                                    algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                                    algorithmModel.yClose.Add(open - (open / 100 * 1));
+
+                                    //algorithmModel.MinusPercent += (5 * 50 / 100 * 3);
+                                    algorithmModel.MinusPercent += 7.5;
+                                    algorithmModel.Minus += 1;
+                                    return i;
+                                }
+
                                 open = open - (open / 100 * 1);
                                 sum.Add(open);
                                 algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
@@ -985,6 +997,165 @@ namespace Project_06.Models
                 }
             }
             return -1;
+        }
+        public void CalculateAlgorithmEight(SymbolModel symbolModel)
+        {
+            AlgorithmEight(symbolModel);
+        }
+        private void AlgorithmEight(SymbolModel symbolModel)
+        {
+            AlgorithmModel algorithmModel = new AlgorithmModel();
+
+            int i = 0;
+
+            while (true)
+            {
+                if (i < symbolModel.oHLCs.Count - 1) {
+                    i = Eight(i, symbolModel, algorithmModel);
+                }
+                else break;
+                i++;
+            }
+
+            ListAlgorithms.Add(algorithmModel);
+        }
+        private int Eight(int i, SymbolModel symbolModel, AlgorithmModel algorithmModel)
+        {
+            double open = symbolModel.oHLCs[i].Open;
+            double openShort = open + (open * 0.01);
+            double slShort = open + (open * 0.03);
+            double tpShort = open + (open * 0.005);
+            double openLong = open - (open * 0.01);
+            double slLong = open - (open * 0.03);
+            double tpLong = open - (open * 0.005);
+
+            if (symbolModel.oHLCs[i].High > openShort)
+            {
+
+                algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                algorithmModel.y.Add(openShort);
+                for (; i < symbolModel.oHLCs.Count - 1; i++)
+                {
+                    if (symbolModel.oHLCs[i].High > slShort || symbolModel.oHLCs[i + 1].High > slShort)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(slShort);
+
+                        algorithmModel.MinusPercent += 2;
+
+                        algorithmModel.Minus += 1;
+                        return i;
+                    }
+                    if (symbolModel.oHLCs[i + 1].Low < tpShort)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(tpShort);
+
+                        algorithmModel.PlusPercent += 0.5;
+
+                        algorithmModel.Plus += 1;
+                        return i;
+                    }
+                }
+            }
+            else
+            if (symbolModel.oHLCs[i].Low < openLong)
+            {
+                algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                algorithmModel.y.Add(openLong);
+
+                for (; i < symbolModel.oHLCs.Count - 1; i++)
+                {
+                    if (symbolModel.oHLCs[i].Low < slLong || symbolModel.oHLCs[i + 1].Low < slLong)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(slLong);
+
+                        algorithmModel.MinusPercent += 2;
+
+                        algorithmModel.Minus += 1;
+                        return i;
+                    }
+                    if (symbolModel.oHLCs[i + 1].High > tpLong)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(tpLong);
+
+                        algorithmModel.PlusPercent += 0.5;
+
+                        algorithmModel.Plus += 1;
+                        return i;
+                    }
+                }
+            }
+
+            return i;
+        }
+        public void CalculateAlgorithmNine(SymbolModel symbolModel)
+        {
+            AlgorithmNine(symbolModel);
+        }
+        private void AlgorithmNine(SymbolModel symbolModel)
+        {
+            AlgorithmModel algorithmModel = new AlgorithmModel();
+
+            int i = 0;
+
+            while (true)
+            {
+                if (i < symbolModel.oHLCs.Count - 1)
+                {
+                    i = Nine(i, symbolModel, algorithmModel);
+                }
+                else break;
+                i++;
+            }
+
+            ListAlgorithms.Add(algorithmModel);
+        }
+        private int Nine(int i, SymbolModel symbolModel, AlgorithmModel algorithmModel)
+        {
+            double open = symbolModel.oHLCs[i].Open;
+            double openShort = open - (open * 0.01);
+            double slShort = open - (open * 0.005);
+            double tpShort = open - (open * 0.03);
+            double openLong = open + (open * 0.01);
+            double slLong = open + (open * 0.005);
+            double tpLong = open + (open * 0.03);
+
+            if (symbolModel.oHLCs[i].High > openLong)
+            {
+
+                algorithmModel.x.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                algorithmModel.y.Add(openLong);
+                for (; i < symbolModel.oHLCs.Count - 1; i++)
+                {
+                    if (symbolModel.oHLCs[i + 1].Low < slLong)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(slLong);
+
+                        algorithmModel.MinusPercent += 0.5;
+
+                        algorithmModel.Minus += 1;
+                        return i;
+                    }
+                    if (symbolModel.oHLCs[i + 1].High > tpLong)
+                    {
+                        algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                        algorithmModel.yClose.Add(tpLong);
+
+                        algorithmModel.PlusPercent += 2;
+
+                        algorithmModel.Plus += 1;
+                        return i;
+                    }
+                }
+
+
+            }
+
+                return i;
         }
     }
 }

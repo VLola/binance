@@ -24,5 +24,6 @@ namespace Project_07.Views
         {
             InitializeComponent();
         }
+
     }
 }

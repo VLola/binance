@@ -14,21 +14,19 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid>
-            <ListView ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}" Background="Transparent" Foreground="AliceBlue">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=SymbolModel.Name}" Width="150"/>
-                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Path=SymbolModel.Price}" Width="100"/>
-                        <GridViewColumn Header="Total" DisplayMemberBinding="{Binding Path=SymbolModel.Total}" Width="70"/>
-                        <GridViewColumn Header="ShortPlus" DisplayMemberBinding="{Binding Path=SymbolModel.ShortPlus}" Width="70"/>
-                        <GridViewColumn Header="ShortMinus" DisplayMemberBinding="{Binding Path=SymbolModel.ShortMinus}" Width="70"/>
-                        <GridViewColumn Header="LongPlus" DisplayMemberBinding="{Binding Path=SymbolModel.LongPlus}" Width="70"/>
-                        <GridViewColumn Header="LongMinus" DisplayMemberBinding="{Binding Path=SymbolModel.LongMinus}" Width="70"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-        </Grid>
+        <ListView Grid.Row="0" ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=SymbolModel.Name}" Width="150"/>
+                    <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Path=SymbolModel.Price}" Width="100"/>
+                    <GridViewColumn Header="Total" DisplayMemberBinding="{Binding Path=SymbolModel.Total}" Width="70"/>
+                    <GridViewColumn Header="ShortPlus" DisplayMemberBinding="{Binding Path=SymbolModel.ShortPlus}" Width="70"/>
+                    <GridViewColumn Header="ShortMinus" DisplayMemberBinding="{Binding Path=SymbolModel.ShortMinus}" Width="70"/>
+                    <GridViewColumn Header="LongPlus" DisplayMemberBinding="{Binding Path=SymbolModel.LongPlus}" Width="70"/>
+                    <GridViewColumn Header="LongMinus" DisplayMemberBinding="{Binding Path=SymbolModel.LongMinus}" Width="70"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
         <Grid Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>

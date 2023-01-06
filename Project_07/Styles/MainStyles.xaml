@@ -1,0 +1,169 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <SolidColorBrush x:Key="Dark.Grey" Color="#2c2e32"/>
+    <SolidColorBrush x:Key="Light.Grey" Color="#FF6B6C6F"/>
+    <SolidColorBrush x:Key="Light.Red" Color="#eb525f"/>
+    <SolidColorBrush x:Key="Light.Green" Color="#12aa92"/>
+    <SolidColorBrush x:Key="Light.White" Color="#e6e6e6"/>
+
+    <Storyboard x:Key="RedAnimation">
+        <Storyboard TargetProperty="Background.Color">
+            <ColorAnimation To="#eb525f" Duration="0:0:0:1" SpeedRatio="4"/>
+        </Storyboard>
+    </Storyboard>
+    <Storyboard x:Key="GreenAnimation">
+        <Storyboard TargetProperty="Background.Color">
+            <ColorAnimation To="#12aa92" Duration="0:0:0:1" SpeedRatio="4"/>
+        </Storyboard>
+    </Storyboard>
+    <Storyboard x:Key="GreyAnimation">
+        <Storyboard TargetProperty="Background.Color">
+            <ColorAnimation To="#404247" Duration="0:0:0:1" SpeedRatio="4"/>
+        </Storyboard>
+    </Storyboard>
+
+    <Style x:Key="headerBorder" TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource Light.Grey}"/>
+        <Setter Property="Background" Value="{StaticResource Dark.Grey}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style TargetType="Grid">
+        <Setter Property="Background" Value="{StaticResource Dark.Grey}"/>
+    </Style>
+
+    <Style x:Key="minimiseButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Dark.Grey}"/>
+        <Setter Property="Foreground" Value="{StaticResource Light.Grey}"/>
+        <!--<Setter Property="Content" Value="🈩"/>-->
+        <Setter Property="Content" Value="―"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="0 0 0 2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource Light.Green}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="closeButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Dark.Grey}"/>
+        <Setter Property="Foreground" Value="{StaticResource Light.Grey}"/>
+        <Setter Property="Content" Value="❎"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Padding" Value="0 0 0 2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource Light.Red}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="OperationBtn" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Light.Grey}"/>
+        <Setter Property="Foreground" Value="{StaticResource Light.White}"/>
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="FontSize" Value="26"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard Storyboard="{StaticResource GreenAnimation}"/>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard Storyboard="{StaticResource GreyAnimation}"/>
+                        </EventTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.8" Color="#12aa92"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="ResultBtn" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Light.Grey}"/>
+        <Setter Property="Foreground" Value="{StaticResource Light.White}"/>
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard Storyboard="{StaticResource RedAnimation}"/>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard Storyboard="{StaticResource GreyAnimation}"/>
+                        </EventTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.8" Color="#eb525f"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="StandartText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Light.White}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="OutputText" TargetType="TextBox">
+        <Setter Property="Foreground" Value="{StaticResource Light.White}"/>
+        <Setter Property="Background" Value="{StaticResource Dark.Grey}"/>
+        <Setter Property="FontSize" Value="34"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Height" Value="70"/>
+        <Setter Property="Width" Value="150"/>
+    </Style>
+    <Style x:Key="OperationText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Light.White}"/>
+        <Setter Property="Background" Value="{StaticResource Light.Grey}"/>
+        <Setter Property="FontSize" Value="48"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    <Style TargetType="ListView">
+        <Setter Property="Background" Value="{StaticResource Light.Grey}"/>
+        <Setter Property="Foreground" Value="{StaticResource Light.White}"/>
+    </Style>
+</ResourceDictionary>

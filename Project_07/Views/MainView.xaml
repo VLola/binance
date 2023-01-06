@@ -7,10 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <Style TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-        </Style>
+        <ResourceDictionary Source="/Styles/MainStyles.xaml"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -18,7 +15,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid>
-            <ListView ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}">
+            <ListView ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}" Background="Transparent" Foreground="AliceBlue">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=SymbolModel.Name}" Width="150"/>
@@ -32,7 +29,7 @@
                 </ListView.View>
             </ListView>
         </Grid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -40,13 +37,14 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Content="Show sum" Grid.Column="0" Command="{Binding Path=ShowSumCommand}"/>
-            <TextBlock Grid.Column="1" Text="{Binding Path=MainModel.Total,StringFormat=Total: {0}}"/>
-            <TextBlock Grid.Column="2" Text="{Binding Path=MainModel.ShortPlus,StringFormat=ShortPlus: {0}}"/>
-            <TextBlock Grid.Column="3" Text="{Binding Path=MainModel.ShortMinus,StringFormat=ShortMinus: {0}}"/>
-            <TextBlock Grid.Column="4" Text="{Binding Path=MainModel.LongPlus,StringFormat=LongPlus: {0}}"/>
-            <TextBlock Grid.Column="5" Text="{Binding Path=MainModel.LongMinus,StringFormat=LongMinus: {0}}"/>
+            <TextBlock Grid.Column="0" Text="{Binding Path=MainModel.Total,StringFormat=Total: {0}}" Style="{StaticResource StandartText}"/>
+            <TextBlock Grid.Column="1" Text="{Binding Path=MainModel.ShortPlus,StringFormat=ShortPlus: {0}}" Style="{StaticResource StandartText}"/>
+            <TextBlock Grid.Column="2" Text="{Binding Path=MainModel.ShortMinus,StringFormat=ShortMinus: {0}}" Style="{StaticResource StandartText}"/>
+            <TextBlock Grid.Column="3" Text="{Binding Path=MainModel.LongPlus,StringFormat=LongPlus: {0}}" Style="{StaticResource StandartText}"/>
+            <TextBlock Grid.Column="4" Text="{Binding Path=MainModel.LongMinus,StringFormat=LongMinus: {0}}" Style="{StaticResource StandartText}"/>
+            <Button Content="Show sum" Grid.Column="6" Command="{Binding Path=ShowSumCommand}" Style="{StaticResource ResultBtn}"/>
         </Grid>
     </Grid>
 </UserControl>

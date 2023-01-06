@@ -5,8 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Project_07" xmlns:views="clr-namespace:Project_07.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        WindowStyle="None"
+        Title="Project 7" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary Source="/Styles/MainStyles.xaml"/>
+    </Window.Resources>
     <Grid>
-        <views:MainView/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Style="{StaticResource headerBorder}" Grid.Row="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="28"/>
+                    <ColumnDefinition Width="28"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Style="{StaticResource StandartText}" Text="Project 7" Padding="20 0"/>
+                <Button Grid.Column="1" x:Name="MinimiseBtn" Style="{StaticResource minimiseButton}" Click="MinimiseBtn_Click"/>
+                <Button Grid.Column="2" x:Name="CloseBtn" Style="{StaticResource closeButton}" Click="CloseBtn_Click"/>
+            </Grid>
+        </Border>
+        <views:MainView Grid.Row="1"/>
     </Grid>
 </Window>

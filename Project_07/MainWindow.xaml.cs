@@ -10,5 +10,14 @@ namespace Project_07
             InitializeComponent();
             DataContext = new MainViewModel();
         }
+        private void MinimiseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

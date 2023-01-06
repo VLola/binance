@@ -5,7 +5,7 @@ namespace Project_07.Models
 {
     public class MainModel: ChangedModel
     {
-        public ObservableCollection<SymbolViewModel> Symbols { get; set; }
+        public ObservableCollection<SymbolViewModel> Symbols { get; set; } = new();
         private SymbolModel _selectedSymbol { get; set; }
         public SymbolModel SelectedSymbol
         {

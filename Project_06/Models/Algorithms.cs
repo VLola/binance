@@ -321,6 +321,7 @@ namespace Project_06.Models
         }
         /// Алгоритм с стоп лосом
         double StopLoss = 2;
+        int Interval = 15;
         public void CalculateAlgorithmFour(SymbolModel symbolModel)
         {
             for (int i = 2; i < 20; i++)
@@ -536,12 +537,16 @@ namespace Project_06.Models
                                 betModel.Symbol = symbolModel.Name;
                                 betModel.IsPositive = true;
                                 betModel.IsLong = false;
+                                betModel.OpenPrice = symbolModel.oHLCs[i + 2].Open;
+                                betModel.ClosePrice = symbolModel.oHLCs[i + 2 + kline].Close;
                                 betModel.OpenTime = symbolModel.oHLCs[i + 2].DateTime;
                                 betModel.CloseTime = symbolModel.oHLCs[i + 2 + kline].DateTime;
                                 betModel.Profit = percent;
                                 betModel.StopLoss = StopLoss;
                                 betModel.Open = algorithmModel.Open;
                                 betModel.Close = algorithmModel.Close;
+                                betModel.Interval = Interval;
+                                algorithmModel.BetModels.Add(betModel);
 
                                 i = i + kline;
                             }
@@ -561,6 +566,23 @@ namespace Project_06.Models
 
                                 algorithmModel.Minus += 1;
                                 algorithmModel.MinusPercent += percent;
+
+
+                                BetModel betModel = new();
+                                betModel.Symbol = symbolModel.Name;
+                                betModel.IsPositive = false;
+                                betModel.IsLong = false;
+                                betModel.OpenPrice = symbolModel.oHLCs[i + 2].Open;
+                                betModel.ClosePrice = symbolModel.oHLCs[i + 2].Open + (symbolModel.oHLCs[i + 2].Open / 100 * StopLoss);
+                                betModel.OpenTime = symbolModel.oHLCs[i + 2].DateTime;
+                                betModel.CloseTime = symbolModel.oHLCs[close].DateTime;
+                                betModel.Profit = -percent;
+                                betModel.StopLoss = StopLoss;
+                                betModel.Open = algorithmModel.Open;
+                                betModel.Close = algorithmModel.Close;
+                                betModel.Interval = Interval;
+                                algorithmModel.BetModels.Add(betModel);
+
                                 i = i + kline;
                             }
                         }

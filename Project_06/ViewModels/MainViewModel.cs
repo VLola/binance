@@ -373,10 +373,10 @@ namespace Project_06.ViewModels
                 //symbolModel.Algorithms.CalculateAlgorithmThree(symbolModel);
 
                 // с стоп лосс в обратную сторону выстрела
-                //symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel);
+                symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel, Interval);
 
                 // с стоп лосс в сторону выстрела
-                symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel, Interval);
+                //symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel, Interval);
 
                 // Algo Акифа
                 //symbolModel.Algorithms.CalculateAlgorithmSix(symbolModel);

@@ -319,9 +319,15 @@ namespace Project_06.Models
 
             ListAlgorithms.Add(algorithmModel);
         }
+        /// Алгоритм с стоп лосом <summary>
         /// Алгоритм с стоп лосом
-        public void CalculateAlgorithmFour(SymbolModel symbolModel)
+        double StopLoss = 2;
+        int Interval;
+        /// </summary>
+        /// <param name="symbolModel"></param>
+        public void CalculateAlgorithmFour(SymbolModel symbolModel, int interval)
         {
+            Interval = interval;
             for (int i = 2; i < 20; i++)
             {
                 for (int j = 0; j < 30; j++)
@@ -347,182 +353,23 @@ namespace Project_06.Models
                         sum += (symbolModel.oHLCs[j].High - symbolModel.oHLCs[j].Low);
                     }
                     double average = (sum / 30);
-                    //Добавлена ещё 1 проверка
                     
                     if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * mul))
                     {
-                        //if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * (mul + 1)))
-                        //{
-                        //    i = i + kline;
-                        //    continue;
-                        //}
                         if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 1].Open)
                         {
                             // Short
                             (bool check, int close) = CheckShort(symbolModel, algorithmModel, i + 1, i + 2 + kline);
                             if (check)
                             {
-                                algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+                                algorithmModel.x.Add(symbolModel.oHLCs[i + 2].DateTime.ToOADate());
+                                algorithmModel.y.Add(symbolModel.oHLCs[i + 2].Open);
 
                                 algorithmModel.xClose.Add(symbolModel.oHLCs[i + 2 + kline].DateTime.ToOADate());
                                 algorithmModel.yClose.Add(symbolModel.oHLCs[i + 2 + kline].Close);
 
 
-                                double percent = Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 100, 2);
-
-                                PointModel pointModel = new();
-                                pointModel.IsPositive = true;
-                                pointModel.IsLong = false;
-                                pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
-                                pointModel.Percent = percent;
-                                algorithmModel.Points.Add(pointModel);
-
-                                algorithmModel.Plus += 1;
-                                algorithmModel.PlusPercent += percent;
-                                i = i + kline;
-                            }
-                            else
-                            {
-                                algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
-
-                                double percent = StopLoss;
-
-                                PointModel pointModel = new();
-                                pointModel.IsPositive = false;
-                                pointModel.IsLong = false;
-                                pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
-                                pointModel.Percent = percent;
-                                algorithmModel.Points.Add(pointModel);
-
-                                algorithmModel.Minus += 1;
-                                algorithmModel.MinusPercent += percent;
-                                i = i + kline;
-                            }
-                        }
-                        //else
-                        //{
-                        //    // Long
-                        //    if (CheckLong(symbolModel, algorithmModel, i + 1, i + 2 + kline))
-                        //    {
-                        //        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                        //        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
-
-                        //        algorithmModel.xClose.Add(symbolModel.oHLCs[i + 2 + kline].DateTime.ToOADate());
-                        //        algorithmModel.yClose.Add(symbolModel.oHLCs[i + 2 + kline].Close);
-
-                        //        double percent = Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 100, 2);
-
-                        //        PointModel pointModel = new();
-                        //        pointModel.IsPositive = true;
-                        //        pointModel.IsLong = true;
-                        //        pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
-                        //        pointModel.Percent = percent;
-                        //        algorithmModel.Points.Add(pointModel);
-
-                        //        algorithmModel.Plus += 1;
-                        //        algorithmModel.PlusPercent += percent;
-                        //        i = i + kline;
-                        //    }
-                        //    else
-                        //    {
-                        //        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                        //        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
-
-                        //        double percent = StopLoss;
-
-                        //        PointModel pointModel = new();
-                        //        pointModel.IsPositive = false;
-                        //        pointModel.IsLong = true;
-                        //        pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
-                        //        pointModel.Percent = percent;
-                        //        algorithmModel.Points.Add(pointModel);
-
-                        //        algorithmModel.Minus += 1;
-                        //        algorithmModel.MinusPercent += percent;
-                        //        i = i + kline;
-                        //    }
-                        //}
-                    }
-                }
-            }
-
-            ListAlgorithms.Add(algorithmModel);
-        }
-        private (bool, int) CheckShort(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
-        {
-            for (int i = (start + 1); i <= end; i++)
-            {
-                if ((symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100))) <= symbolModel.oHLCs[i].High)
-                {
-                    algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
-                    algorithmModel.yClose.Add(symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100)));
-                    return (false, i);
-                }
-            }
-            return (true, 0);
-        }
-        private bool CheckLong(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
-        {
-            for (int i = (start + 1); i <= end; i++)
-            {
-                if ((symbolModel.oHLCs[start].Close - (symbolModel.oHLCs[start].Close * (StopLoss / 100))) >= symbolModel.oHLCs[i].Low)
-                {
-                    algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
-                    algorithmModel.yClose.Add(symbolModel.oHLCs[start].Close - (symbolModel.oHLCs[start].Close * (StopLoss / 100)));
-                    return false;
-                }
-            }
-            return true;
-        }
-        double StopLoss = 2;
-        int Interval;
-        public void CalculateAlgorithmFive(SymbolModel symbolModel, int interval)
-        {
-            Interval = interval;
-            for (int i = 2; i < 20; i++)
-            {
-                for (int j = 0; j < 30; j++)
-                {
-                    AlgorithmFive(symbolModel, i, j);
-                }
-            }
-        }
-        private void AlgorithmFive(SymbolModel symbolModel, int mul, int kline)
-        {
-            AlgorithmModel algorithmModel = new AlgorithmModel();
-
-            algorithmModel.Open = mul;
-            algorithmModel.Close = kline;
-
-            for (int i = 0; i < symbolModel.oHLCs.Count - 3 - kline; i++)
-            {
-                if (i > 30)
-                {
-                    double sum = 0;
-                    for (int j = i; j > (i - 30); j--)
-                    {
-                        sum += (symbolModel.oHLCs[j].High - symbolModel.oHLCs[j].Low);
-                    }
-                    double average = (sum / 30);
-
-                    if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * mul))
-                    {
-                        if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 1].Open)
-                        {
-                            // Short
-                            (bool check, int close) = CheckShort(symbolModel, algorithmModel, i + 1, i + 2 + kline);
-                            if (check)
-                            {
-                                algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
-                                algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
-
-                                algorithmModel.xClose.Add(symbolModel.oHLCs[i + 2 + kline].DateTime.ToOADate());
-                                algorithmModel.yClose.Add(symbolModel.oHLCs[i + 2 + kline].Close);
-
-
-                                double percent = Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 100, 2);
+                                double percent = Math.Round((symbolModel.oHLCs[i + 2].Open - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 100, 2);
 
                                 PointModel pointModel = new();
                                 pointModel.IsPositive = true;
@@ -583,6 +430,205 @@ namespace Project_06.Models
                                 betModel.Close = algorithmModel.Close;
                                 betModel.Interval = Interval;
                                 algorithmModel.BetModels.Add(betModel);
+
+                                i = i + kline;
+                            }
+                        }
+                        //else
+                        //{
+                        //    // Long
+                        //    if (CheckLong(symbolModel, algorithmModel, i + 1, i + 2 + kline))
+                        //    {
+                        //        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                        //        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+
+                        //        algorithmModel.xClose.Add(symbolModel.oHLCs[i + 2 + kline].DateTime.ToOADate());
+                        //        algorithmModel.yClose.Add(symbolModel.oHLCs[i + 2 + kline].Close);
+
+                        //        double percent = Math.Round((symbolModel.oHLCs[i + 2 + kline].Close - symbolModel.oHLCs[i + 1].Close) / symbolModel.oHLCs[i + 1].Close * 100, 2);
+
+                        //        PointModel pointModel = new();
+                        //        pointModel.IsPositive = true;
+                        //        pointModel.IsLong = true;
+                        //        pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                        //        pointModel.Percent = percent;
+                        //        algorithmModel.Points.Add(pointModel);
+
+                        //        algorithmModel.Plus += 1;
+                        //        algorithmModel.PlusPercent += percent;
+                        //        i = i + kline;
+                        //    }
+                        //    else
+                        //    {
+                        //        algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                        //        algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+
+                        //        double percent = StopLoss;
+
+                        //        PointModel pointModel = new();
+                        //        pointModel.IsPositive = false;
+                        //        pointModel.IsLong = true;
+                        //        pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                        //        pointModel.Percent = percent;
+                        //        algorithmModel.Points.Add(pointModel);
+
+                        //        algorithmModel.Minus += 1;
+                        //        algorithmModel.MinusPercent += percent;
+                        //        i = i + kline;
+                        //    }
+                        //}
+                    }
+                }
+            }
+
+            ListAlgorithms.Add(algorithmModel);
+        }
+        private (bool, int) CheckShort(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
+        {
+            for (int i = (start + 1); i <= end; i++)
+            {
+                if ((symbolModel.oHLCs[start + 1].Open + (symbolModel.oHLCs[start + 1].Open * (StopLoss / 100))) <= symbolModel.oHLCs[i].High)
+                {
+                    algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                    algorithmModel.yClose.Add(symbolModel.oHLCs[start + 1].Open + (symbolModel.oHLCs[start + 1].Open * (StopLoss / 100)));
+                    return (false, i);
+                }
+            }
+            return (true, 0);
+        }
+
+        //private bool CheckShort(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
+        //{
+        //    for (int i = (start + 1); i <= end; i++)
+        //    {
+        //        if ((symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100))) <= symbolModel.oHLCs[i].High)
+        //        {
+        //            algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+        //            algorithmModel.yClose.Add(symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100)));
+        //            return false;
+        //        }
+        //    }
+        //    return true;
+        //}
+        private bool CheckLong(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
+        {
+            for (int i = (start + 1); i <= end; i++)
+            {
+                if ((symbolModel.oHLCs[start].Close - (symbolModel.oHLCs[start].Close * (StopLoss / 100))) >= symbolModel.oHLCs[i].Low)
+                {
+                    algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
+                    algorithmModel.yClose.Add(symbolModel.oHLCs[start].Close - (symbolModel.oHLCs[start].Close * (StopLoss / 100)));
+                    return false;
+                }
+            }
+            return true;
+        }
+        public void CalculateAlgorithmFive(SymbolModel symbolModel, int interval)
+        {
+            Interval = interval;
+            for (int i = 2; i < 20; i++)
+            {
+                for (int j = 0; j < 30; j++)
+                {
+                    AlgorithmFive(symbolModel, i, j);
+                }
+            }
+        }
+        private void AlgorithmFive(SymbolModel symbolModel, int mul, int kline)
+        {
+            AlgorithmModel algorithmModel = new AlgorithmModel();
+
+            algorithmModel.Open = mul;
+            algorithmModel.Close = kline;
+
+            for (int i = 0; i < symbolModel.oHLCs.Count - 3 - kline; i++)
+            {
+                if (i > 30)
+                {
+                    double sum = 0;
+                    for (int j = i; j > (i - 30); j--)
+                    {
+                        sum += (symbolModel.oHLCs[j].High - symbolModel.oHLCs[j].Low);
+                    }
+                    double average = (sum / 30);
+
+                    if ((symbolModel.oHLCs[i + 1].High - symbolModel.oHLCs[i + 1].Low) > (average * mul))
+                    {
+                        if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 1].Open)
+                        {
+                            // Short
+                            (bool check, int close) = CheckShort(symbolModel, algorithmModel, i + 1, i + 2 + kline);
+                            if (check)
+                            {
+                                algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+
+                                algorithmModel.xClose.Add(symbolModel.oHLCs[i + 2 + kline].DateTime.ToOADate());
+                                algorithmModel.yClose.Add(symbolModel.oHLCs[i + 2 + kline].Close);
+
+
+                                double percent = Math.Round((symbolModel.oHLCs[i + 1].Close - symbolModel.oHLCs[i + 2 + kline].Close) / symbolModel.oHLCs[i + 2 + kline].Close * 100, 2);
+
+                                PointModel pointModel = new();
+                                pointModel.IsPositive = true;
+                                pointModel.IsLong = false;
+                                pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                                pointModel.Percent = percent;
+                                algorithmModel.Points.Add(pointModel);
+
+                                algorithmModel.Plus += 1;
+                                algorithmModel.PlusPercent += percent;
+
+                                //BetModel betModel = new();
+                                //betModel.Symbol = symbolModel.Name;
+                                //betModel.IsPositive = true;
+                                //betModel.IsLong = false;
+                                //betModel.OpenPrice = symbolModel.oHLCs[i + 2].Open;
+                                //betModel.ClosePrice = symbolModel.oHLCs[i + 2 + kline].Close;
+                                //betModel.OpenTime = symbolModel.oHLCs[i + 2].DateTime;
+                                //betModel.CloseTime = symbolModel.oHLCs[i + 2 + kline].DateTime;
+                                //betModel.Profit = percent;
+                                //betModel.StopLoss = StopLoss;
+                                //betModel.Open = algorithmModel.Open;
+                                //betModel.Close = algorithmModel.Close;
+                                //betModel.Interval = Interval;
+                                //algorithmModel.BetModels.Add(betModel);
+
+                                i = i + kline;
+                            }
+                            else
+                            {
+                                algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
+                                algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
+
+                                double percent = StopLoss;
+
+                                PointModel pointModel = new();
+                                pointModel.IsPositive = false;
+                                pointModel.IsLong = false;
+                                pointModel.Time = symbolModel.oHLCs[i + 1].DateTime.ToOADate();
+                                pointModel.Percent = percent;
+                                algorithmModel.Points.Add(pointModel);
+
+                                algorithmModel.Minus += 1;
+                                algorithmModel.MinusPercent += percent;
+
+
+                                //BetModel betModel = new();
+                                //betModel.Symbol = symbolModel.Name;
+                                //betModel.IsPositive = false;
+                                //betModel.IsLong = false;
+                                //betModel.OpenPrice = symbolModel.oHLCs[i + 2].Open;
+                                //betModel.ClosePrice = symbolModel.oHLCs[i + 2].Open + (symbolModel.oHLCs[i + 2].Open / 100 * StopLoss);
+                                //betModel.OpenTime = symbolModel.oHLCs[i + 2].DateTime;
+                                //// изменить!
+                                //betModel.CloseTime = symbolModel.oHLCs[i + 3].DateTime;
+                                //betModel.Profit = -percent;
+                                //betModel.StopLoss = StopLoss;
+                                //betModel.Open = algorithmModel.Open;
+                                //betModel.Close = algorithmModel.Close;
+                                //betModel.Interval = Interval;
+                                //algorithmModel.BetModels.Add(betModel);
 
                                 i = i + kline;
                             }

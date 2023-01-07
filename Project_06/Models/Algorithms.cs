@@ -382,6 +382,7 @@ namespace Project_06.Models
                                 algorithmModel.PlusPercent += percent;
 
                                 BetModel betModel = new();
+                                betModel.Number = ListAlgorithms.Count;
                                 betModel.Symbol = symbolModel.Name;
                                 betModel.IsPositive = true;
                                 betModel.IsLong = false;
@@ -417,6 +418,7 @@ namespace Project_06.Models
 
 
                                 BetModel betModel = new();
+                                betModel.Number = ListAlgorithms.Count;
                                 betModel.Symbol = symbolModel.Name;
                                 betModel.IsPositive = false;
                                 betModel.IsLong = false;

@@ -34,6 +34,7 @@ namespace Project_06.ViewModels
 
         private string _pathLog = $"{Directory.GetCurrentDirectory()}/log/";
         private string _pathKlines = $"{Directory.GetCurrentDirectory()}/klines/";
+        private string _pathStatistics = $"{Directory.GetCurrentDirectory()}/statistics/";
         public MainModel MainModel { get; set; }
         private BinanceClient? _client { get; set; }
         private RelayCommand? _startCommand;
@@ -57,10 +58,21 @@ namespace Project_06.ViewModels
                 }));
             }
         }
+        private RelayCommand? _saveStatisticsCommand;
+        public RelayCommand SaveStatisticsCommand
+        {
+            get
+            {
+                return _saveStatisticsCommand ?? (_saveStatisticsCommand = new RelayCommand(obj => {
+                    SaveAllStatistics();
+                }));
+            }
+        }
         public MainViewModel()
         {
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
             if (!Directory.Exists(_pathKlines)) Directory.CreateDirectory(_pathKlines);
+            if (!Directory.Exists(_pathStatistics)) Directory.CreateDirectory(_pathStatistics);
             //----------------------------------------------------------------------------------------------------------Commit
             _client = new();
 
@@ -251,7 +263,10 @@ namespace Project_06.ViewModels
                 double profit = statisticsModel.PlusPercent - statisticsModel.MinusPercent;
                 statisticsModel.Profit = Math.Round(profit - commision, 2);
 
-                list.Add(statisticsModel);
+                if (statisticsModel.Win >= 1.5 && statisticsModel.Profit >= 200)
+                {
+                    list.Add(statisticsModel);
+                }
             }
             var result = list.OrderByDescending(a => a.Win);
 
@@ -260,8 +275,25 @@ namespace Project_06.ViewModels
                 foreach (var item in result)
                 {
                     MainModel.Statistics.Add(item);
+                    MainModel.StatisticsNumbers.Add(item.Number);
                 }
             }));
+        }
+        private async void SaveAllStatistics()
+        {
+            await Task.Run(() =>
+            {
+                List<BetModel> list = new();
+                foreach (var item in MainModel.Symbols)
+                {
+                    foreach (var algo in item.Algorithms.ListAlgorithms)
+                    {
+                        list.AddRange(algo.BetModels.Where(item => MainModel.StatisticsNumbers.Contains(item.Number)));
+                    }
+                }
+                File.WriteAllText(_pathStatistics + "statistics", JsonConvert.SerializeObject(list));
+                MessageBox.Show("Ok save");
+            });
         }
         private async void SaveAllSymbol()
         {

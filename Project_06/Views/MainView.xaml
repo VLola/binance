@@ -47,6 +47,7 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Calculate" Command="{Binding Path=StartCommand}"/>
             <Grid Grid.Column="1">
@@ -63,6 +64,7 @@
             <TextBlock Grid.Column="5" Text="{Binding Path=MainModel.MinusPercent,StringFormat=Minus % {0}}"/>
             <TextBlock Grid.Column="6" Text="Loading" Style="{StaticResource styleTextBlockLoading}"/>
             <Button Grid.Column="7" Content="Save klines" Command="{Binding Path=SaveKlinesCommand}"/>
+            <Button Grid.Column="8" Content="Save statistics" Command="{Binding Path=SaveStatisticsCommand}"/>
         </Grid>
         <Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
             <ListView ItemsSource="{Binding Path=MainModel.Symbols}" SelectedItem="{Binding Path=MainModel.SelectedSymbol}">

@@ -274,7 +274,7 @@ namespace Project_06.ViewModels
 
             });
         }
-        int Interval = 1;
+        int Interval = 15;
         int Size = 540;
         private async void SaveSymbol(string symbol, DateTime dateTime)
         {
@@ -376,7 +376,7 @@ namespace Project_06.ViewModels
                 //symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel);
 
                 // с стоп лосс в сторону выстрела
-                symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel);
+                symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel, Interval);
 
                 // Algo Акифа
                 //symbolModel.Algorithms.CalculateAlgorithmSix(symbolModel);

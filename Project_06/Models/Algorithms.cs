@@ -320,8 +320,6 @@ namespace Project_06.Models
             ListAlgorithms.Add(algorithmModel);
         }
         /// Алгоритм с стоп лосом
-        double StopLoss = 2;
-        int Interval = 15;
         public void CalculateAlgorithmFour(SymbolModel symbolModel)
         {
             for (int i = 2; i < 20; i++)
@@ -478,8 +476,11 @@ namespace Project_06.Models
             }
             return true;
         }
-        public void CalculateAlgorithmFive(SymbolModel symbolModel)
+        double StopLoss = 2;
+        int Interval;
+        public void CalculateAlgorithmFive(SymbolModel symbolModel, int interval)
         {
+            Interval = interval;
             for (int i = 2; i < 20; i++)
             {
                 for (int j = 0; j < 30; j++)

@@ -360,7 +360,8 @@ namespace Project_06.Models
                         if (symbolModel.oHLCs[i + 1].Close > symbolModel.oHLCs[i + 1].Open)
                         {
                             // Short
-                            if (CheckShort(symbolModel, algorithmModel, i + 1, i + 2 + kline))
+                            (bool check, int close) = CheckShort(symbolModel, algorithmModel, i + 1, i + 2 + kline);
+                            if (check)
                             {
                                 algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
                                 algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
@@ -450,7 +451,7 @@ namespace Project_06.Models
 
             ListAlgorithms.Add(algorithmModel);
         }
-        private bool CheckShort(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
+        private (bool, int) CheckShort(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
         {
             for (int i = (start + 1); i <= end; i++)
             {
@@ -458,10 +459,10 @@ namespace Project_06.Models
                 {
                     algorithmModel.xClose.Add(symbolModel.oHLCs[i].DateTime.ToOADate());
                     algorithmModel.yClose.Add(symbolModel.oHLCs[start].Close + (symbolModel.oHLCs[start].Close * (StopLoss / 100)));
-                    return false;
+                    return (false, i);
                 }
             }
-            return true;
+            return (true, 0);
         }
         private bool CheckLong(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)
         {
@@ -509,7 +510,8 @@ namespace Project_06.Models
                         if (symbolModel.oHLCs[i + 1].Close < symbolModel.oHLCs[i + 1].Open)
                         {
                             // Short
-                            if (CheckShort(symbolModel, algorithmModel, i + 1, i + 2 + kline))
+                            (bool check, int close) = CheckShort(symbolModel, algorithmModel, i + 1, i + 2 + kline);
+                            if (check)
                             {
                                 algorithmModel.x.Add(symbolModel.oHLCs[i + 1].DateTime.ToOADate());
                                 algorithmModel.y.Add(symbolModel.oHLCs[i + 1].Close);
@@ -529,6 +531,18 @@ namespace Project_06.Models
 
                                 algorithmModel.Plus += 1;
                                 algorithmModel.PlusPercent += percent;
+
+                                BetModel betModel = new();
+                                betModel.Symbol = symbolModel.Name;
+                                betModel.IsPositive = true;
+                                betModel.IsLong = false;
+                                betModel.OpenTime = symbolModel.oHLCs[i + 2].DateTime;
+                                betModel.CloseTime = symbolModel.oHLCs[i + 2 + kline].DateTime;
+                                betModel.Profit = percent;
+                                betModel.StopLoss = StopLoss;
+                                betModel.Open = algorithmModel.Open;
+                                betModel.Close = algorithmModel.Close;
+
                                 i = i + kline;
                             }
                             else

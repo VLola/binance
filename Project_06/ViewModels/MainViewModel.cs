@@ -244,7 +244,7 @@ namespace Project_06.ViewModels
                 statisticsModel.MinusPercent = minusPercent;
                 statisticsModel.Win = Math.Round(plusPercent / minusPercent, 2);
                 statisticsModel.Number = i;
-                statisticsModel.Open = open; 
+                statisticsModel.Open = open;
                 statisticsModel.Close = close;
 
                 double commision = (statisticsModel.Plus + statisticsModel.Minus) * 0.08;
@@ -376,13 +376,14 @@ namespace Project_06.ViewModels
                 //symbolModel.Algorithms.CalculateAlgorithmFour(symbolModel);
 
                 // с стоп лосс в сторону выстрела
-                //symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel);
+                symbolModel.Algorithms.CalculateAlgorithmFive(symbolModel);
 
+                // Algo Акифа
                 //symbolModel.Algorithms.CalculateAlgorithmSix(symbolModel);
                 //symbolModel.Algorithms.CalculateAlgorithmSeven(symbolModel);
 
                 //symbolModel.Algorithms.CalculateAlgorithmEight(symbolModel);
-                symbolModel.Algorithms.CalculateAlgorithmNine(symbolModel);
+                //symbolModel.Algorithms.CalculateAlgorithmNine(symbolModel);
 
             }
         }

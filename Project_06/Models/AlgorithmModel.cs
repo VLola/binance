@@ -5,7 +5,7 @@ namespace Project_06.Models
 {
     public class AlgorithmModel
     {
-        public List<BetModel> BetModels { get; set; } = new();
+        public List<Bet> BetModels { get; set; } = new();
         public List<double> x = new();
         public List<double> y = new();
         public List<double> xClose = new();

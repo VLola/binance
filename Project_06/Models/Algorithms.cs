@@ -338,6 +338,7 @@ namespace Project_06.Models
         }
         private void AlgorithmFour(SymbolModel symbolModel, int mul, int kline)
         {
+            BetContext betContext = new();
             AlgorithmModel algorithmModel = new AlgorithmModel();
 
             algorithmModel.Open = mul;
@@ -381,7 +382,7 @@ namespace Project_06.Models
                                 algorithmModel.Plus += 1;
                                 algorithmModel.PlusPercent += percent;
 
-                                BetModel betModel = new();
+                                Bet betModel = new();
                                 betModel.Number = ListAlgorithms.Count;
                                 betModel.Symbol = symbolModel.Name;
                                 betModel.IsPositive = true;
@@ -417,7 +418,7 @@ namespace Project_06.Models
                                 algorithmModel.MinusPercent += percent;
 
 
-                                BetModel betModel = new();
+                                Bet betModel = new();
                                 betModel.Number = ListAlgorithms.Count;
                                 betModel.Symbol = symbolModel.Name;
                                 betModel.IsPositive = false;
@@ -483,6 +484,8 @@ namespace Project_06.Models
                 }
             }
 
+            //betContext.Bets.AddRange(algorithmModel.BetModels);
+            //betContext.SaveChanges();
             ListAlgorithms.Add(algorithmModel);
         }
         private (bool, int) CheckShort(SymbolModel symbolModel, AlgorithmModel algorithmModel, int start, int end)

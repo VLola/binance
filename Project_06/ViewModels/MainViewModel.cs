@@ -70,6 +70,10 @@ namespace Project_06.ViewModels
         }
         public MainViewModel()
         {
+            using (BetContext context = new BetContext())
+            {
+                context.Bets.Create();
+            }
             if (!Directory.Exists(_pathLog)) Directory.CreateDirectory(_pathLog);
             if (!Directory.Exists(_pathKlines)) Directory.CreateDirectory(_pathKlines);
             if (!Directory.Exists(_pathStatistics)) Directory.CreateDirectory(_pathStatistics);
@@ -263,10 +267,11 @@ namespace Project_06.ViewModels
                 double profit = statisticsModel.PlusPercent - statisticsModel.MinusPercent;
                 statisticsModel.Profit = Math.Round(profit - commision, 2);
 
-                if (statisticsModel.Win >= 1.5 && statisticsModel.Profit >= 200)
+                if (statisticsModel.Win >= 1.3 && statisticsModel.Profit >= 200)
                 {
                     list.Add(statisticsModel);
                 }
+                //list.Add(statisticsModel);
             }
             var result = list.OrderByDescending(a => a.Win);
 
@@ -283,7 +288,7 @@ namespace Project_06.ViewModels
         {
             await Task.Run(() =>
             {
-                List<BetModel> list = new();
+                List<Bet> list = new();
                 foreach (var item in MainModel.Symbols)
                 {
                     foreach (var algo in item.Algorithms.ListAlgorithms)
